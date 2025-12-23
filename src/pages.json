@@ -21,6 +21,90 @@
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/baker-detail/index",
+      "style": {
+        "navigationBarTitleText": "主理人详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/favorites/index",
+      "style": {
+        "navigationBarTitleText": "我的收藏",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/likes/index",
+      "style": {
+        "navigationBarTitleText": "我的喜欢",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/address-list/index",
+      "style": {
+        "navigationBarTitleText": "我的地址",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/address-edit/index",
+      "style": {
+        "navigationBarTitleText": "编辑地址",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/feedback/index",
+      "style": {
+        "navigationBarTitleText": "问题反馈",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/edit-profile/index",
+      "style": {
+        "navigationBarTitleText": "编辑资料",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
+    },
+    {
+      "path": "pages/baker-profile/index",
+      "style": {
+        "navigationBarTitleText": "主理人中心",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/baker-orders/index",
+      "style": {
+        "navigationBarTitleText": "订单管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/baker-breads/index",
+      "style": {
+        "navigationBarTitleText": "面包管理",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/baker-achievements/index",
+      "style": {
+        "navigationBarTitleText": "我的成就",
+        "navigationStyle": "default",
+        "navigationBarBackgroundColor": "#FFFFFF"
+      }
     }
   ],
   "globalStyle": {
