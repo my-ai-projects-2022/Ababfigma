@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面包详情弹窗</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Roboto', 'PingFang SC', sans-serif;
+      background-color: rgba(0, 0, 0, 0.5);
+      width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    /* 底部抽屉弹窗 */
+    .drawer-modal {
+      width: 100%;
+      max-height: 75vh;
+      background: white;
+      border-radius: 24px 24px 0 0;
+      overflow: hidden;
+      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    /* 顶部栏 */
+    .modal-header {
+      position: relative;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #F0F0F0;
+    }
+
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #F0F0F0;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .like-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      background: #FFF5ED;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* 内容区域 */
+    .modal-body {
+      overflow-y: auto;
+      max-height: calc(75vh - 140px);
+    }
+
+    /* 面包图片 */
+    .bread-image-large {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #F0F0F0;
+    }
+
+    /* 信息区 */
+    .bread-info {
+      padding: 20px;
+    }
+
+    .bread-name-large {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2C3E50;
+      margin-bottom: 8px;
+    }
+
+    .bread-price-large {
+      font-size: 24px;
+      font-weight: 700;
+      color: #E67E22;
+      margin-bottom: 16px;
+    }
+
+    .bread-description {
+      font-size: 14px;
+      color: #7F8C8D;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* 数量选择 */
+    .quantity-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .qty-btn-large {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #E67E22;
+      background: white;
+      font-size: 20px;
+      color: #E67E22;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-display {
+      font-size: 24px;
+      font-weight: 700;
+      color: #E67E22;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* 底部按钮 */
+    .modal-footer {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 16px;
+      border-top: 1px solid #F0F0F0;
+    }
+
+    .buy-btn {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="drawer-modal">
+    <!-- 顶部栏 -->
+    <div class="modal-header">
+      <button class="close-btn">×</button>
+      <button class="like-btn">
+        ❤️ 喜欢
+      </button>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="modal-body">
+      <!-- 面包图片 -->
+      <div class="bread-image-large"></div>
+
+      <!-- 信息区 -->
+      <div class="bread-info">
+        <div class="bread-name-large">法式长棍</div>
+        <div class="bread-price-large">¥28 / 个</div>
+        <div class="bread-description">
+          口感酥脆，外焦里嫩，采用传统法式工艺制作。精选进口小麦粉，经过长时间发酵，每一口都充满麦香。适合搭配各种料理，也可以单独享用。
+        </div>
+
+        <!-- 数量选择 -->
+        <div class="quantity-section">
+          <button class="qty-btn-large">−</button>
+          <div class="qty-display">2</div>
+          <button class="qty-btn-large">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="modal-footer">
+      <button class="buy-btn">
+        立即购买 ¥56
+      </button>
+    </div>
+  </div>
+</body>
+</html>
