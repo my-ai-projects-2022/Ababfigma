@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>主理人中心 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .baker-profile-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+      padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+
+    .baker-profile-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      padding: 16px;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 16px;
+    }
+
+    .baker-profile-user-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .baker-profile-user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .baker-profile-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .baker-profile-user-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .baker-profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .baker-profile-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .baker-order-status-inline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .baker-order-toggle-inline {
+      position: relative;
+      width: 32px;
+      height: 18px;
+      border-radius: 9px;
+      background-color: rgba(255, 255, 255, 0.3);
+      transition: background-color 0.3s;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .baker-order-toggle-inline.active {
+      background-color: white;
+    }
+
+    .baker-order-toggle-knob-inline {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s;
+    }
+
+    .baker-order-toggle-inline.active .baker-order-toggle-knob-inline {
+      left: 16px;
+      background-color: var(--color-primary);
+    }
+
+    .baker-order-status-text-inline {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: white;
+    }
+
+    .baker-profile-specialties {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .baker-profile-settings-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .baker-profile-quick-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .baker-quick-action-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 6px;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .baker-stats-section {
+      padding: 0 16px;
+      margin-bottom: 16px;
+    }
+
+    .baker-stats-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 12px;
+    }
+
+    .baker-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .baker-stat-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .baker-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .baker-stat-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+
+    .baker-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 375px;
+      margin: 0 auto;
+      background-color: white;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .baker-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      color: var(--color-text-secondary);
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .baker-nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .baker-nav-label {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="baker-profile-page">
+    <div class="baker-profile-header">
+      <div class="baker-profile-user-section">
+        <div class="baker-profile-user-info">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" alt="主理人" class="baker-profile-avatar" />
+          <div class="baker-profile-user-details">
+            <div class="baker-profile-name-row">
+              <div class="baker-profile-name">我的面包工坊</div>
+              <div class="baker-order-status-inline">
+                <div class="baker-order-toggle-inline active" id="orderToggle" onclick="toggleOrderStatus()">
+                  <div class="baker-order-toggle-knob-inline"></div>
+                </div>
+                <span class="baker-order-status-text-inline" id="orderStatusText">营业中</span>
+              </div>
+            </div>
+            <div class="baker-profile-specialties">主营：法棍、可颂、欧包、软欧包</div>
+          </div>
+        </div>
+        <button class="baker-profile-settings-btn" onclick="toggleSettings()">
+          <svg class="icon icon-lg" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364L16.95 16.95m-9.9-9.9L7.05 7.05M21.364 4.636l-2.121 2.121m-12.728 0L4.636 4.636"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="baker-profile-quick-actions">
+        <button class="baker-quick-action-btn" onclick="window.location.href='payment-qrcode-modal.html'">
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <rect x="7" y="7" width="10" height="10"></rect>
+          </svg>
+          <span>收款码</span>
+        </button>
+        <button class="baker-quick-action-btn" onclick="window.location.href='profile.html'">
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"></polyline>
+            <polyline points="15 18 21 12 15 6"></polyline>
+          </svg>
+          <span>切换用户</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="baker-stats-section">
+      <div class="baker-stats-title">数据看板</div>
+      <div class="baker-stats-grid">
+        <div class="baker-stat-card">
+          <div class="baker-stat-value">12</div>
+          <div class="baker-stat-label">今日订单数</div>
+        </div>
+        <div class="baker-stat-card">
+          <div class="baker-stat-value">5</div>
+          <div class="baker-stat-label">待处理订单</div>
+        </div>
+        <div class="baker-stat-card">
+          <div class="baker-stat-value">¥1280.50</div>
+          <div class="baker-stat-label">今日收入</div>
+        </div>
+        <div class="baker-stat-card">
+          <div class="baker-stat-value">¥45678.90</div>
+          <div class="baker-stat-label">总收入</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="baker-bottom-nav">
+      <div class="baker-nav-item" onclick="window.location.href='baker-orders.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span class="baker-nav-label">订单</span>
+      </div>
+      <div class="baker-nav-item" onclick="window.location.href='baker-breads.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+          <path d="M3 6h18"></path>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="baker-nav-label">面包</span>
+      </div>
+      <div class="baker-nav-item active" onclick="window.location.href='baker-profile.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="baker-nav-label">我的</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isAcceptingOrders = true;
+
+    function toggleOrderStatus() {
+      isAcceptingOrders = !isAcceptingOrders;
+      const toggle = document.getElementById('orderToggle');
+      const statusText = document.getElementById('orderStatusText');
+      
+      if (isAcceptingOrders) {
+        toggle.classList.add('active');
+        statusText.textContent = '营业中';
+      } else {
+        toggle.classList.remove('active');
+        statusText.textContent = '休息中';
+      }
+    }
+
+    function toggleSettings() {
+      // 显示设置菜单
+      alert('设置功能');
+    }
+  </script>
+</body>
+</html>
+

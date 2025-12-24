@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分享 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .share-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+      padding: 20px;
+    }
+
+    .share-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 340px;
+      max-height: 90vh;
+      border-radius: 16px;
+      position: relative;
+      animation: scaleIn 0.3s ease-out;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .share-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    .share-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .share-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .share-section {
+      margin-bottom: 20px;
+    }
+
+    .share-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .share-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .share-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .share-copy-btn.copied {
+      background-color: #E8F5E9;
+      color: var(--color-success);
+    }
+
+    .share-text-box {
+      padding: 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid var(--color-border);
+    }
+
+    .share-link-box {
+      padding: 10px 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--color-primary);
+      word-break: break-all;
+      border: 1px solid var(--color-border);
+      font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .share-qrcode {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .share-qrcode-image {
+      width: 160px;
+      height: 160px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      background-color: white;
+    }
+
+    .share-qrcode-hint {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="share-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="share-modal-content">
+      <button class="share-modal-close" onclick="window.history.back()">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="share-modal-body">
+        <h2 class="share-modal-title">分享给好友</h2>
+
+        <div class="share-section">
+          <div class="share-section-header">
+            <span class="share-section-label">分享文案</span>
+            <button class="share-copy-btn" id="copyTextBtn" onclick="copyText()">
+              <svg class="icon icon-sm" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="share-text-box" id="shareText">
+发现了一家超棒的面包工坊！
+
+👨‍🍳 麦田工坊
+🍞 招牌面包：法棍、可颂、欧包
+
+快来看看吧～</div>
+        </div>
+
+        <div class="share-section">
+          <div class="share-section-header">
+            <span class="share-section-label">分享链接</span>
+            <button class="share-copy-btn" id="copyLinkBtn" onclick="copyLink()">
+              <svg class="icon icon-sm" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="share-link-box" id="shareLink">https://example.com/baker/1</div>
+        </div>
+
+        <div class="share-section">
+          <span class="share-section-label">扫码访问</span>
+          <div class="share-qrcode">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://example.com/baker/1" alt="分享二维码" class="share-qrcode-image" />
+            <p class="share-qrcode-hint">长按保存图片，在微信中识别二维码</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyText() {
+      const text = document.getElementById('shareText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyTextBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = `
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>已复制</span>
+        `;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `
+            <svg class="icon icon-sm" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>复制</span>
+          `;
+        }, 2000);
+      });
+    }
+
+    function copyLink() {
+      const link = document.getElementById('shareLink').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        const btn = document.getElementById('copyLinkBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = `
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>已复制</span>
+        `;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `
+            <svg class="icon icon-sm" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>复制</span>
+          `;
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
+

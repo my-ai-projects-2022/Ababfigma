@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的喜欢 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .likes-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .page-back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-header-spacer {
+      width: 40px;
+    }
+
+    .likes-content {
+      padding: 16px;
+    }
+
+    .likes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .like-bread-card {
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .like-bread-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .like-bread-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      overflow: hidden;
+      background-color: var(--color-bg);
+    }
+
+    .like-bread-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .like-bread-heart {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-error);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .like-bread-info {
+      padding: 12px;
+    }
+
+    .like-bread-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .like-bread-baker {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .like-bread-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      color: var(--color-border);
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-hint {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="likes-page">
+    <div class="page-header">
+      <button class="page-back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title">我的喜欢</h1>
+      <div class="page-header-spacer"></div>
+    </div>
+
+    <div class="likes-content">
+      <div class="likes-grid" id="likesGrid">
+        <!-- 动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const likedBreads = [
+      {
+        id: '1',
+        breadId: '1',
+        breadName: '经典法棍',
+        breadImage: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400',
+        breadPrice: 18.00,
+        bakerName: '麦田工坊',
+        bakerId: '1',
+      },
+      {
+        id: '2',
+        breadId: '3',
+        breadName: '全麦软欧包',
+        breadImage: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400',
+        breadPrice: 22.00,
+        bakerName: '阿雅烘焙坊',
+        bakerId: '3',
+      },
+    ];
+
+    function renderLikes() {
+      const container = document.getElementById('likesGrid');
+      if (likedBreads.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <svg class="icon icon-xl empty-icon" viewBox="0 0 24 24">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <p class="empty-text">暂无喜欢</p>
+            <p class="empty-hint">快去喜欢您心仪的面包吧</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = likedBreads.map(item => `
+        <div class="like-bread-card" onclick="window.location.href='baker-detail.html?id=${item.bakerId}'">
+          <div class="like-bread-image-wrapper">
+            <img src="${item.breadImage}" alt="${item.breadName}" class="like-bread-image" />
+            <div class="like-bread-heart">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="like-bread-info">
+            <h3 class="like-bread-name">${item.breadName}</h3>
+            <div class="like-bread-baker">${item.bakerName}</div>
+            <div class="like-bread-price">¥${item.breadPrice.toFixed(2)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderLikes();
+  </script>
+</body>
+</html>
+

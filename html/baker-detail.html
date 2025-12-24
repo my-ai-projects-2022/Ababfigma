@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>主理人详情 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    /* 详情页容器 */
+    .baker-detail {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 详情顶部导航 */
+    .detail-top-nav {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      height: 44px;
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .detail-nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      color: var(--color-text-primary);
+    }
+
+    .detail-nav-btn:hover {
+      background-color: var(--color-bg);
+    }
+
+    .detail-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .favorite-btn.favorited {
+      color: var(--color-error);
+    }
+
+    /* 详情内容区 */
+    .detail-content {
+      flex: 1;
+      margin-top: 44px;
+      padding-bottom: 80px;
+      overflow-y: auto;
+    }
+
+    /* 主理人信息卡片 */
+    .detail-baker-info {
+      background-color: var(--color-card);
+      padding: 20px 16px;
+      margin-bottom: 12px;
+    }
+
+    .detail-info-header {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .detail-avatar-container {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .detail-baker-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .detail-avatar-status-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-avatar-status-dot.open {
+      background-color: var(--color-success);
+    }
+
+    .detail-avatar-status-dot.closed {
+      background-color: var(--color-text-secondary);
+    }
+
+    .detail-info-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .detail-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .detail-baker-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .detail-verified-icon {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+      color: var(--color-primary-light);
+    }
+
+    .detail-check-mark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .detail-sold-count {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .detail-sold-number {
+      color: var(--color-primary-light);
+      font-weight: 700;
+    }
+
+    .detail-location-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .detail-location-info {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .detail-distance-text,
+    .detail-location-text {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .detail-location-divider {
+      color: var(--color-text-secondary);
+      margin: 0 2px;
+    }
+
+    .detail-hot-breads {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .detail-hot-bread-tag {
+      padding: 4px 10px;
+      background-color: #FFF3E0;
+      border: 1px solid #FFE0B2;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--color-primary-dark);
+      font-weight: 500;
+    }
+
+    /* 面包列表 */
+    .bread-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 12px 16px;
+    }
+
+    /* 面包卡片 */
+    .detail-bread-card {
+      background-color: var(--color-card);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .detail-bread-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .detail-bread-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+      background-color: var(--color-bg);
+    }
+
+    .detail-bread-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-hot-tip {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      padding: 2px 8px;
+      background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .detail-bread-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .detail-bread-name-price {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .detail-bread-name {
+      font-size: 13px;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .detail-bread-price {
+      flex-shrink: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .detail-bread-tags {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .detail-bread-category,
+    .detail-bread-tag {
+      box-sizing: border-box;
+      padding: 0 6px;
+      font-size: 10px;
+      border-radius: 4px;
+      font-weight: 500;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .detail-bread-category.category-sweet {
+      background-color: #FCE4EC;
+      color: #C2185B;
+    }
+
+    .detail-bread-category.category-savory {
+      background-color: #FFF3E0;
+      color: #F57C00;
+    }
+
+    .detail-bread-description {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      flex: 1;
+    }
+
+    .detail-order-controls {
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    .detail-want-btn {
+      width: 100%;
+      height: 32px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+    }
+
+    .detail-want-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+    }
+
+    .detail-quantity-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .detail-minus-btn,
+    .detail-plus-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .detail-minus-btn:active,
+    .detail-plus-btn:active {
+      transform: scale(0.9);
+    }
+
+    .detail-quantity-input {
+      flex: 1;
+      height: 28px;
+      text-align: center;
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      background-color: var(--color-bg);
+      outline: none;
+      min-width: 0;
+    }
+
+    .detail-quantity-input:focus {
+      border-color: var(--color-primary);
+      background-color: white;
+    }
+
+    /* 底部购物车 */
+    .detail-cart-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      height: 64px;
+      background-color: white;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+    }
+
+    .detail-cart-bar.active {
+      box-shadow: 0 -2px 16px rgba(230, 126, 34, 0.15);
+    }
+
+    .detail-cart-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .detail-cart-icon-wrapper {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .detail-cart-bar.active .detail-cart-icon-wrapper {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    }
+
+    .detail-cart-icon {
+      color: var(--color-text-secondary);
+      transition: color 0.3s;
+    }
+
+    .detail-cart-bar.active .detail-cart-icon {
+      color: white;
+    }
+
+    .detail-cart-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background-color: var(--color-error);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .detail-cart-price-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail-cart-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .detail-cart-desc {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .detail-cart-empty-text {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .detail-checkout-btn {
+      padding: 12px 32px;
+      background-color: var(--color-border);
+      color: var(--color-text-secondary);
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      cursor: not-allowed;
+    }
+
+    .detail-checkout-btn.active {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .detail-checkout-btn.active:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(230, 126, 34, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="baker-detail">
+    <!-- 顶部导航 -->
+    <div class="detail-top-nav">
+      <button class="detail-nav-btn back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="detail-nav-right">
+        <button class="detail-nav-btn favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </button>
+        <button class="detail-nav-btn note-btn" onclick="showNoteModal()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </button>
+        <button class="detail-nav-btn share-btn" onclick="showShareModal()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 详情内容 -->
+    <div class="detail-content">
+      <!-- 主理人信息 -->
+      <div class="detail-baker-info" id="bakerInfo"></div>
+      
+      <!-- 面包列表 -->
+      <div class="bread-list" id="breadList"></div>
+    </div>
+    
+    <!-- 底部购物车 -->
+    <div class="detail-cart-bar" id="cartBar">
+      <div class="detail-cart-info">
+        <div class="detail-cart-icon-wrapper" onclick="showCartModal()">
+          <svg class="detail-cart-icon icon icon-lg" viewBox="0 0 24 24">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+            <path d="M3 6h18"></path>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <div class="detail-cart-badge hidden" id="cartBadge">0</div>
+        </div>
+        <div class="detail-cart-price-info">
+          <div class="detail-cart-empty-text" id="cartEmptyText">未选商品</div>
+          <div class="hidden" id="cartPriceInfo">
+            <div class="detail-cart-price" id="cartPrice">¥0.00</div>
+            <div class="detail-cart-desc" id="cartDesc">已选 0 件</div>
+          </div>
+        </div>
+      </div>
+      <button class="detail-checkout-btn" id="checkoutBtn" onclick="showCheckoutModal()" disabled>
+        去结算
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 从 URL 获取主理人 ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const bakerId = urlParams.get('id') || '1';
+
+    // 模拟数据
+    const bakerData = {
+      id: bakerId,
+      name: '麦田工坊',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+      isVerified: true,
+      totalSold: 328,
+      distance: 1.2,
+      location: '武侯区桐梓林',
+      isOpen: true,
+      hotBreads: [
+        { name: '法棍', count: 128 },
+        { name: '可颂', count: 95 },
+        { name: '欧包', count: 67 },
+      ],
+      breads: [
+        {
+          id: '1',
+          name: '经典法棍',
+          image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400',
+          price: 18.00,
+          isHot: true,
+          isPurchased: true,
+          category: '咸面包',
+          tags: ['健康', '长时间发酵'],
+          description: '传统法式工艺，72小时低温发酵，外脆内软',
+          soldCount: 128,
+        },
+        {
+          id: '2',
+          name: '牛角可颂',
+          image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400',
+          price: 12.00,
+          isHot: true,
+          isPurchased: false,
+          category: '甜面包',
+          tags: ['全麦'],
+          description: '法国AOP认证黄油，层次分明',
+          soldCount: 95,
+        },
+        {
+          id: '3',
+          name: '全麦软欧包',
+          image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400',
+          price: 22.00,
+          isHot: false,
+          isPurchased: true,
+          category: '咸面包',
+          tags: ['健康', '全麦', '易消化'],
+          description: '100%全麦粉，添加坚果和果干，营养丰富',
+          soldCount: 67,
+        },
+      ],
+    };
+
+    let cart = {};
+    let isFavorited = false;
+
+    // 渲染主理人信息
+    function renderBakerInfo() {
+      const container = document.getElementById('bakerInfo');
+      container.innerHTML = `
+        <div class="detail-info-header">
+          <div class="detail-avatar-container">
+            <img src="${bakerData.avatar}" alt="${bakerData.name}" class="detail-baker-avatar" />
+            <div class="detail-avatar-status-dot ${bakerData.isOpen ? 'open' : 'closed'}"></div>
+          </div>
+          <div class="detail-info-main">
+            <div class="detail-name-row">
+              <h1 class="detail-baker-name">${bakerData.name}</h1>
+              ${bakerData.isVerified ? `
+                <div class="detail-verified-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+              ` : ''}
+            </div>
+            <div class="detail-sold-count">
+              已卖出 <span class="detail-sold-number">${bakerData.totalSold}</span> 个面包
+            </div>
+          </div>
+        </div>
+        <div class="detail-location-row">
+          <div class="detail-location-info">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-text-secondary);">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="detail-distance-text">${bakerData.distance}km</span>
+            <span class="detail-location-divider">·</span>
+            <span class="detail-location-text">${bakerData.location}</span>
+          </div>
+        </div>
+        <div class="detail-hot-breads">
+          ${bakerData.hotBreads.map(item => `
+            <div class="detail-hot-bread-tag">
+              ${item.name}
+              <span>(${item.count > 100 ? '100+' : item.count})</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 渲染面包列表
+    function renderBreads() {
+      const container = document.getElementById('breadList');
+      container.innerHTML = bakerData.breads.map(bread => {
+        const quantity = cart[bread.id] || 0;
+        return `
+          <div class="detail-bread-card" onclick="openBreadDetail('${bread.id}')">
+            <div class="detail-bread-image-wrapper">
+              <img src="${bread.image}" alt="${bread.name}" class="detail-bread-image" />
+              ${bread.isHot ? '<div class="detail-hot-tip">热卖</div>' : ''}
+            </div>
+            <div class="detail-bread-info">
+              <div class="detail-bread-name-price">
+                <div class="detail-bread-name">${bread.name}</div>
+                <div class="detail-bread-price">¥${bread.price.toFixed(2)}</div>
+              </div>
+              <div class="detail-bread-tags">
+                ${bread.isPurchased ? '<div class="detail-purchased-tag">购买过</div>' : ''}
+                <div class="detail-bread-category category-${bread.category === '甜面包' ? 'sweet' : 'savory'}">${bread.category}</div>
+                ${bread.tags.map(tag => `<div class="detail-bread-tag">${tag}</div>`).join('')}
+              </div>
+              <div class="detail-bread-description">${bread.description}</div>
+              <div class="detail-order-controls" onclick="event.stopPropagation()">
+                ${quantity === 0 ? `
+                  <button class="detail-want-btn" onclick="addToCart('${bread.id}')">想吃</button>
+                ` : `
+                  <div class="detail-quantity-controls">
+                    <button class="detail-minus-btn" onclick="removeFromCart('${bread.id}')">
+                      <svg class="icon icon-sm" viewBox="0 0 24 24">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                    <input type="text" class="detail-quantity-input" value="${quantity}" 
+                      onchange="updateQuantity('${bread.id}', this.value)" />
+                    <button class="detail-plus-btn" onclick="addToCart('${bread.id}')">
+                      <svg class="icon icon-sm" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 更新购物车显示
+    function updateCartBar() {
+      const totalItems = Object.values(cart).reduce((sum, count) => sum + count, 0);
+      const totalPrice = Object.entries(cart).reduce((sum, [breadId, count]) => {
+        const bread = bakerData.breads.find(b => b.id === breadId);
+        return sum + (bread?.price || 0) * count;
+      }, 0);
+
+      const cartBar = document.getElementById('cartBar');
+      const cartBadge = document.getElementById('cartBadge');
+      const cartEmptyText = document.getElementById('cartEmptyText');
+      const cartPriceInfo = document.getElementById('cartPriceInfo');
+      const cartPrice = document.getElementById('cartPrice');
+      const cartDesc = document.getElementById('cartDesc');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+
+      if (totalItems > 0) {
+        cartBar.classList.add('active');
+        cartBadge.classList.remove('hidden');
+        cartBadge.textContent = totalItems > 99 ? '99+' : totalItems;
+        cartEmptyText.classList.add('hidden');
+        cartPriceInfo.classList.remove('hidden');
+        cartPrice.textContent = `¥${totalPrice.toFixed(2)}`;
+        cartDesc.textContent = `已选 ${totalItems} 件`;
+        checkoutBtn.classList.add('active');
+        checkoutBtn.disabled = false;
+      } else {
+        cartBar.classList.remove('active');
+        cartBadge.classList.add('hidden');
+        cartEmptyText.classList.remove('hidden');
+        cartPriceInfo.classList.add('hidden');
+        checkoutBtn.classList.remove('active');
+        checkoutBtn.disabled = true;
+      }
+    }
+
+    // 添加到购物车
+    function addToCart(breadId) {
+      cart[breadId] = (cart[breadId] || 0) + 1;
+      updateCartBar();
+      renderBreads();
+    }
+
+    // 从购物车移除
+    function removeFromCart(breadId) {
+      if (cart[breadId] > 1) {
+        cart[breadId] -= 1;
+      } else {
+        delete cart[breadId];
+      }
+      updateCartBar();
+      renderBreads();
+    }
+
+    // 更新数量
+    function updateQuantity(breadId, value) {
+      const numValue = parseInt(value, 10);
+      if (!isNaN(numValue) && numValue >= 0) {
+        if (numValue === 0) {
+          delete cart[breadId];
+        } else {
+          cart[breadId] = numValue;
+        }
+        updateCartBar();
+        renderBreads();
+      }
+    }
+
+    // 切换收藏
+    function toggleFavorite() {
+      isFavorited = !isFavorited;
+      const btn = document.getElementById('favoriteBtn');
+      if (isFavorited) {
+        btn.classList.add('favorited');
+      } else {
+        btn.classList.remove('favorited');
+      }
+    }
+
+    // 打开面包详情
+    function openBreadDetail(breadId) {
+      window.location.href = `bread-detail-modal.html?bakerId=${bakerId}&breadId=${breadId}`;
+    }
+
+    // 显示购物车弹窗
+    function showCartModal() {
+      window.location.href = `cart-modal.html?bakerId=${bakerId}`;
+    }
+
+    // 显示结算弹窗
+    function showCheckoutModal() {
+      window.location.href = `checkout-modal.html?bakerId=${bakerId}`;
+    }
+
+    // 显示分享弹窗
+    function showShareModal() {
+      window.location.href = `share-modal.html?bakerId=${bakerId}`;
+    }
+
+    // 显示备注弹窗
+    function showNoteModal() {
+      window.location.href = `note-modal.html?bakerId=${bakerId}`;
+    }
+
+    // 初始化
+    renderBakerInfo();
+    renderBreads();
+    updateCartBar();
+  </script>
+</body>
+</html>
+

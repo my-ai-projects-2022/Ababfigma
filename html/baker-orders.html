@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订单管理 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .baker-orders-page {
+      background-color: var(--color-bg);
+      max-width: 375px;
+      min-height: 100vh;
+      padding-bottom: calc(70px + env(safe-area-inset-bottom));
+      margin: 0 auto;
+    }
+
+    .baker-orders-header {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 16px;
+      padding: 16px;
+    }
+
+    .baker-orders-title-row {
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      display: flex;
+    }
+
+    .baker-orders-title {
+      color: #fff;
+      text-align: left;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .baker-orders-tabs {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      gap: 8px;
+      padding: 4px;
+      display: flex;
+    }
+
+    .baker-orders-tab {
+      color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      flex: 1;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .baker-orders-tab.active {
+      color: var(--color-primary);
+      background-color: #fff;
+    }
+
+    .baker-orders-content {
+      padding: 0 16px;
+    }
+
+    .order-dimension-view,
+    .bread-dimension-view {
+      margin-bottom: 16px;
+    }
+
+    .order-dimension-view.hidden,
+    .bread-dimension-view.hidden {
+      display: none;
+    }
+
+    .order-status-tabs {
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 4px;
+      display: flex;
+      overflow-x: auto;
+    }
+
+    .order-status-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .order-status-tab {
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      border: 1px solid var(--color-border);
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .order-status-tab.active {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+
+    .order-list {
+      flex-direction: column;
+      gap: 12px;
+      display: flex;
+    }
+
+    .order-card {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .order-card-header {
+      border-bottom: 1px solid var(--color-border);
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      display: flex;
+    }
+
+    .order-number {
+      color: var(--color-text-primary);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .order-time {
+      color: var(--color-text-secondary);
+      font-size: 13px;
+    }
+
+    .order-user-info {
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      display: flex;
+    }
+
+    .order-user-avatar {
+      object-fit: cover;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+    }
+
+    .order-user-name {
+      color: var(--color-text-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .order-breads-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .order-bread-item {
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      display: flex;
+    }
+
+    .order-bread-info {
+      flex-direction: column;
+      gap: 2px;
+      display: flex;
+    }
+
+    .order-bread-name {
+      color: var(--color-text-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .order-bread-count {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
+    .order-bread-complete-btn {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-radius: 16px;
+      min-width: 60px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .order-bread-complete-btn.completed {
+      background-color: var(--color-success);
+    }
+
+    .order-bread-complete-btn:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+    }
+
+    .order-bread-complete-btn:active:not(:disabled) {
+      transform: scale(.95);
+    }
+
+    .order-pickup-time {
+      background-color: rgba(52, 152, 219, 0.1);
+      border-radius: 8px;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      display: flex;
+    }
+
+    .order-pickup-icon {
+      color: #3498db;
+      flex-shrink: 0;
+    }
+
+    .order-pickup-text {
+      color: var(--color-text-primary);
+      flex: 1;
+      font-size: 13px;
+    }
+
+    .order-pickup-input {
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      border-radius: 6px;
+      flex: 1;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+
+    .order-pickup-edit-btn {
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      background-color: #fff;
+      border-radius: 12px;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all .2s;
+      display: flex;
+      cursor: pointer;
+      border: none;
+    }
+
+    .order-pickup-edit-btn.submit {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .order-card-footer {
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      display: flex;
+    }
+
+    .order-status-badge {
+      color: #fff;
+      border-radius: 16px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: default;
+    }
+
+    .order-deliver-btn {
+      background-color: var(--color-success);
+      color: #fff;
+      border-radius: 16px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .order-deliver-btn:active {
+      transform: scale(.95);
+    }
+
+    .order-empty-state {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 64px 32px;
+      display: flex;
+    }
+
+    .order-empty-icon {
+      margin-bottom: 16px;
+      font-size: 64px;
+    }
+
+    .order-empty-text {
+      color: var(--color-text-secondary);
+      font-size: 15px;
+    }
+
+    .bread-status-tabs {
+      gap: 8px;
+      margin-bottom: 16px;
+      display: flex;
+    }
+
+    .bread-status-tab {
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border);
+      background-color: #fff;
+      border-radius: 16px;
+      flex: 1;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-status-tab.active {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+
+    .bread-task-list {
+      flex-direction: column;
+      gap: 12px;
+      display: flex;
+    }
+
+    .bread-task-card {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .bread-task-header {
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      display: flex;
+    }
+
+    .bread-task-title {
+      align-items: baseline;
+      gap: 8px;
+      display: flex;
+    }
+
+    .bread-task-name {
+      color: var(--color-text-primary);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .bread-task-total {
+      color: var(--color-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .bread-task-complete-btn {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-radius: 16px;
+      min-width: 60px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-task-complete-btn.completed {
+      background-color: var(--color-success);
+    }
+
+    .bread-task-complete-btn:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+    }
+
+    .bread-task-complete-btn:active:not(:disabled) {
+      transform: scale(.95);
+    }
+
+    .bread-task-progress {
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      padding: 12px;
+    }
+
+    .bread-task-progress-label {
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .bread-task-progress-input-group {
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      display: flex;
+    }
+
+    .bread-task-progress-text {
+      color: var(--color-text-secondary);
+      font-size: 13px;
+    }
+
+    .bread-task-progress-input {
+      border: 1px solid var(--color-border);
+      width: 60px;
+      color: var(--color-text-primary);
+      text-align: center;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .bread-task-progress-total {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+
+    .bread-task-progress-bar {
+      background-color: rgba(230, 126, 34, 0.2);
+      border-radius: 3px;
+      width: 100%;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .bread-task-progress-fill {
+      background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      height: 100%;
+      transition: width .3s;
+    }
+
+    .bread-task-update-btn {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-radius: 8px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-task-update-btn:active {
+      transform: scale(.98);
+    }
+
+    .bread-empty-state {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 64px 32px;
+      display: flex;
+    }
+
+    .bread-empty-icon {
+      margin-bottom: 16px;
+      font-size: 64px;
+    }
+
+    .bread-empty-text {
+      color: var(--color-text-secondary);
+      font-size: 15px;
+    }
+
+    .baker-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 375px;
+      margin: 0 auto;
+      background-color: white;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .baker-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      color: var(--color-text-secondary);
+      transition: color 0.2s;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .baker-nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .baker-nav-label {
+      font-size: 12px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="baker-orders-page">
+    <div class="baker-orders-header">
+      <div class="baker-orders-title-row">
+        <div class="baker-orders-title">订单管理</div>
+      </div>
+      <div class="baker-orders-tabs">
+        <button class="baker-orders-tab active" id="orderTab" onclick="toggleView('order')">订单维度</button>
+        <button class="baker-orders-tab" id="breadTab" onclick="toggleView('bread')">面包维度</button>
+      </div>
+    </div>
+
+    <div class="baker-orders-content">
+      <div class="order-dimension-view" id="orderView">
+        <!-- 动态渲染 -->
+      </div>
+      <div class="bread-dimension-view hidden" id="breadView">
+        <!-- 动态渲染 -->
+      </div>
+    </div>
+
+    <div class="baker-bottom-nav">
+      <button class="baker-nav-item active" onclick="window.location.href='baker-orders.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2" width="6" height="4" rx="1"></rect>
+          <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"></path>
+          <path d="M16 13H8"></path>
+          <path d="M16 17H8"></path>
+          <path d="M10 9h6"></path>
+        </svg>
+        <span class="baker-nav-label">订单</span>
+      </button>
+      <button class="baker-nav-item" onclick="window.location.href='baker-breads.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.6 13.11a5.07 5.07 0 0 0 .8 7.5"></path>
+          <path d="M19.4 13.11a5.07 5.07 0 0 1-.8 7.5"></path>
+          <path d="M3.8 6.06a4.89 4.89 0 0 1 2.4-1.9"></path>
+          <path d="M20.2 6.06a4.89 4.89 0 0 0-2.4-1.9"></path>
+          <path d="M8 2v2"></path>
+          <path d="M16 2v2"></path>
+          <path d="M12 20.94V22"></path>
+          <path d="M3 12a9 9 0 0 1 8-8.94"></path>
+          <path d="M21 12a9 9 0 0 0-8-8.94"></path>
+        </svg>
+        <span class="baker-nav-label">面包</span>
+      </button>
+      <button class="baker-nav-item" onclick="window.location.href='baker-profile.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="baker-nav-label">我的</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const statusTabs = [
+      { key: 'all', label: '全部' },
+      { key: 'pending', label: '待处理' },
+      { key: 'processing', label: '制作中' },
+      { key: 'completed', label: '制作完成' },
+      { key: 'delivered', label: '已交付' },
+    ];
+
+    const statusLabels = {
+      pending: '待处理',
+      processing: '制作中',
+      completed: '全部制作完成',
+      delivered: '已交付',
+    };
+
+    const statusColors = {
+      pending: '#F39C12',
+      processing: '#3498DB',
+      completed: '#27AE60',
+      delivered: '#95A5A6',
+    };
+
+    const orders = [
+      {
+        id: '1',
+        orderNumber: '#2024121601',
+        time: '今天 09:30',
+        userName: '张小姐',
+        userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+        breads: [
+          { id: 'b1', name: '贝果', totalCount: 3, completedCount: 0 },
+          { id: 'b2', name: '土司', totalCount: 5, completedCount: 0 },
+        ],
+        pickupTime: '今天 15:00',
+        status: 'pending',
+      },
+      {
+        id: '2',
+        orderNumber: '#2024121602',
+        time: '今天 10:15',
+        userName: '李先生',
+        userAvatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200',
+        breads: [
+          { id: 'b3', name: '贝果', totalCount: 2, completedCount: 2 },
+          { id: 'b4', name: '可颂', totalCount: 4, completedCount: 2 },
+        ],
+        pickupTime: '今天 16:00',
+        status: 'processing',
+      },
+      {
+        id: '3',
+        orderNumber: '#2024121603',
+        time: '今天 11:00',
+        userName: '王女士',
+        userAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+        breads: [
+          { id: 'b5', name: '法棍', totalCount: 2, completedCount: 2 },
+          { id: 'b6', name: '欧包', totalCount: 3, completedCount: 3 },
+        ],
+        pickupTime: '今天 17:00',
+        status: 'completed',
+      },
+    ];
+
+    const breadTasks = [
+      {
+        id: '1',
+        name: '贝果',
+        totalCount: 15,
+        completedCount: 5,
+        status: 'processing',
+      },
+      {
+        id: '2',
+        name: '土司',
+        totalCount: 8,
+        completedCount: 3,
+        status: 'processing',
+      },
+      {
+        id: '3',
+        name: '法棍',
+        totalCount: 6,
+        completedCount: 6,
+        status: 'completed',
+      },
+    ];
+
+    let viewMode = 'order';
+    let activeStatus = 'all';
+    let activeBreadStatus = 'all';
+    let editingPickupTime = null;
+    let tempPickupTime = '';
+
+    function renderOrderView() {
+      const container = document.getElementById('orderView');
+      const filteredOrders = activeStatus === 'all' 
+        ? orders 
+        : orders.filter(order => order.status === activeStatus);
+
+      container.innerHTML = `
+        <div class="order-status-tabs">
+          ${statusTabs.map(tab => `
+            <button class="order-status-tab ${activeStatus === tab.key ? 'active' : ''}" 
+              onclick="setActiveStatus('${tab.key}')">
+              ${tab.label}
+            </button>
+          `).join('')}
+        </div>
+        <div class="order-list">
+          ${filteredOrders.length === 0 ? `
+            <div class="order-empty-state">
+              <div class="order-empty-icon">📦</div>
+              <div class="order-empty-text">暂无订单</div>
+            </div>
+          ` : filteredOrders.map(order => `
+            <div class="order-card">
+              <div class="order-card-header">
+                <div class="order-number">${order.orderNumber}</div>
+                <div class="order-time">${order.time}</div>
+              </div>
+              <div class="order-user-info">
+                <img src="${order.userAvatar}" alt="${order.userName}" class="order-user-avatar" />
+                <div class="order-user-name">${order.userName}</div>
+              </div>
+              <div class="order-breads-list">
+                ${order.breads.map(bread => `
+                  <div class="order-bread-item">
+                    <div class="order-bread-info">
+                      <span class="order-bread-name">${bread.name}</span>
+                      <span class="order-bread-count">共${bread.totalCount}个，已完成 ${bread.completedCount}个</span>
+                    </div>
+                    <button
+                      class="order-bread-complete-btn ${bread.completedCount === bread.totalCount ? 'completed' : ''}"
+                      onclick="completeBread('${order.id}', '${bread.id}')"
+                      ${bread.completedCount === bread.totalCount ? 'disabled' : ''}
+                    >
+                      ${bread.completedCount === bread.totalCount ? '✓' : '完成'}
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="order-pickup-time">
+                <svg class="icon order-pickup-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                ${editingPickupTime === order.id ? `
+                  <input
+                    type="text"
+                    value="${tempPickupTime}"
+                    oninput="tempPickupTime = this.value"
+                    class="order-pickup-input"
+                    placeholder="预计取货时间"
+                  />
+                  <button class="order-pickup-edit-btn submit" onclick="submitPickupTime('${order.id}')">
+                    提交
+                  </button>
+                ` : `
+                  <span class="order-pickup-text">预计取货：${order.pickupTime}</span>
+                  <button class="order-pickup-edit-btn" onclick="editPickupTime('${order.id}', '${order.pickupTime}')">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                `}
+              </div>
+              <div class="order-card-footer">
+                <button class="order-status-badge" style="background-color: ${statusColors[order.status]}">
+                  ${statusLabels[order.status]}
+                </button>
+                ${order.status === 'completed' ? `
+                  <button class="order-deliver-btn" onclick="updateStatus('${order.id}', 'delivered')">
+                    标记为已交付
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderBreadView() {
+      const container = document.getElementById('breadView');
+      const breadStatusTabs = [
+        { key: 'all', label: '全部' },
+        { key: 'processing', label: '制作中' },
+        { key: 'completed', label: '制作完成' },
+      ];
+      
+      const filteredTasks = activeBreadStatus === 'all'
+        ? breadTasks
+        : breadTasks.filter(task => task.status === activeBreadStatus);
+
+      container.innerHTML = `
+        <div class="bread-status-tabs">
+          ${breadStatusTabs.map(tab => `
+            <button class="bread-status-tab ${activeBreadStatus === tab.key ? 'active' : ''}" 
+              onclick="setActiveBreadStatus('${tab.key}')">
+              ${tab.label}
+            </button>
+          `).join('')}
+        </div>
+        <div class="bread-task-list">
+          ${filteredTasks.length === 0 ? `
+            <div class="bread-empty-state">
+              <div class="bread-empty-icon">🥖</div>
+              <div class="bread-empty-text">暂无面包任务</div>
+            </div>
+          ` : filteredTasks.map(task => `
+            <div class="bread-task-card">
+              <div class="bread-task-header">
+                <div class="bread-task-title">
+                  <span class="bread-task-name">待完成${task.name}</span>
+                  <span class="bread-task-total">${task.totalCount}个</span>
+                </div>
+                <button
+                  class="bread-task-complete-btn ${task.status === 'completed' ? 'completed' : ''}"
+                  onclick="completeBreadTask('${task.id}')"
+                  ${task.status === 'completed' ? 'disabled' : ''}
+                >
+                  ${task.status === 'completed' ? '✓' : '完成'}
+                </button>
+              </div>
+              <div class="bread-task-progress">
+                <div class="bread-task-progress-label">面包完成进度</div>
+                <div class="bread-task-progress-input-group">
+                  <span class="bread-task-progress-text">当前完成数量：</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="${task.totalCount}"
+                    value="${task.completedCount}"
+                    onchange="updateCompletedCount('${task.id}', this.value)"
+                    class="bread-task-progress-input"
+                  />
+                  <span class="bread-task-progress-total">/ ${task.totalCount}</span>
+                </div>
+                <div class="bread-task-progress-bar">
+                  <div
+                    class="bread-task-progress-fill"
+                    style="width: ${(task.completedCount / task.totalCount) * 100}%"
+                  ></div>
+                </div>
+              </div>
+              <button class="bread-task-update-btn" onclick="openUpdateModal('${task.id}')">
+                更新订单状态
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function toggleView(mode) {
+      viewMode = mode;
+      const orderView = document.getElementById('orderView');
+      const breadView = document.getElementById('breadView');
+      const orderTab = document.getElementById('orderTab');
+      const breadTab = document.getElementById('breadTab');
+
+      if (mode === 'order') {
+        orderView.classList.remove('hidden');
+        breadView.classList.add('hidden');
+        orderTab.classList.add('active');
+        breadTab.classList.remove('active');
+      } else {
+        orderView.classList.add('hidden');
+        breadView.classList.remove('hidden');
+        orderTab.classList.remove('active');
+        breadTab.classList.add('active');
+      }
+    }
+
+    function setActiveStatus(status) {
+      activeStatus = status;
+      renderOrderView();
+    }
+
+    function setActiveBreadStatus(status) {
+      activeBreadStatus = status;
+      renderBreadView();
+    }
+
+    function completeBread(orderId, breadId) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        const bread = order.breads.find(b => b.id === breadId);
+        if (bread && bread.completedCount < bread.totalCount) {
+          bread.completedCount = bread.totalCount;
+          
+          // 自动更新订单状态
+          const allCompleted = order.breads.every(b => b.completedCount === b.totalCount);
+          const hasProcessing = order.breads.some(b => b.completedCount > 0 && b.completedCount < b.totalCount);
+          const hasAnyCompleted = order.breads.some(b => b.completedCount > 0);
+          
+          if (allCompleted) {
+            order.status = 'completed';
+          } else if (hasAnyCompleted || hasProcessing) {
+            order.status = 'processing';
+          }
+          
+          renderOrderView();
+        }
+      }
+    }
+
+    function editPickupTime(orderId, currentTime) {
+      editingPickupTime = orderId;
+      tempPickupTime = currentTime;
+      renderOrderView();
+    }
+
+    function submitPickupTime(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        order.pickupTime = tempPickupTime;
+        editingPickupTime = null;
+        tempPickupTime = '';
+        renderOrderView();
+      }
+    }
+
+    function updateStatus(orderId, newStatus) {
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        order.status = newStatus;
+        renderOrderView();
+      }
+    }
+
+    function completeBreadTask(taskId) {
+      const task = breadTasks.find(t => t.id === taskId);
+      if (task && task.completedCount < task.totalCount) {
+        task.completedCount = task.totalCount;
+        task.status = 'completed';
+        renderBreadView();
+      }
+    }
+
+    function updateCompletedCount(taskId, value) {
+      const task = breadTasks.find(t => t.id === taskId);
+      if (task) {
+        const count = Math.max(0, Math.min(parseInt(value) || 0, task.totalCount));
+        task.completedCount = count;
+        task.status = count === task.totalCount ? 'completed' : 'processing';
+        renderBreadView();
+      }
+    }
+
+    function openUpdateModal(taskId) {
+      window.location.href = `update-orders-modal.html?taskId=${taskId}`;
+    }
+
+    renderOrderView();
+    renderBreadView();
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的收藏 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .favorites-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .page-back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-header-spacer {
+      width: 40px;
+    }
+
+    .favorites-content {
+      padding: 12px 0;
+    }
+
+    .favorites-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    .baker-card {
+      background-color: #FFFFFF;
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .baker-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+      background-color: var(--color-text-secondary);
+    }
+
+    .status-dot.active {
+      background-color: var(--color-success);
+    }
+
+    .info-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .baker-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .distance-inline {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .distance-text {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .bread-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .bread-tag {
+      padding: 4px 8px;
+      background-color: var(--color-bg);
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .bread-text {
+      font-size: 12px;
+      color: var(--color-primary);
+    }
+
+    .arrow {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      color: var(--color-text-secondary);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      color: var(--color-border);
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-hint {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="favorites-page">
+    <div class="page-header">
+      <button class="page-back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title">我的收藏</h1>
+      <div class="page-header-spacer"></div>
+    </div>
+
+    <div class="favorites-content">
+      <div class="favorites-list" id="favoritesList">
+        <!-- 动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const favoriteBakers = [
+      {
+        id: '1',
+        name: '麦田工坊',
+        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+        distance: 1.2,
+        breads: ['法棍', '可颂', '欧包'],
+        isOpen: true,
+      },
+      {
+        id: '3',
+        name: '阿雅烘焙坊',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+        distance: 0.8,
+        breads: ['司康', '软欧包', '牛角包'],
+        isOpen: true,
+      },
+    ];
+
+    function renderFavorites() {
+      const container = document.getElementById('favoritesList');
+      if (favoriteBakers.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg class="icon icon-xl empty-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <p class="empty-text">暂无收藏</p>
+            <p class="empty-hint">快去收藏您喜欢的主理人吧</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = favoriteBakers.map(baker => {
+        const displayBreads = baker.breads.slice(0, 3);
+        return `
+          <div class="baker-card" onclick="window.location.href='baker-detail.html?id=${baker.id}'">
+            <div class="card-content">
+              <div class="avatar-wrapper">
+                <img src="${baker.avatar}" alt="${baker.name}" class="avatar" />
+                <div class="status-dot ${baker.isOpen ? 'active' : ''}"></div>
+              </div>
+              <div class="info-wrapper">
+                <div class="header-row">
+                  <span class="baker-name">${baker.name}</span>
+                  <div class="distance-inline">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-text-secondary);">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span class="distance-text">${baker.distance}km</span>
+                  </div>
+                </div>
+                <div class="bread-tags">
+                  ${displayBreads.map(bread => `
+                    <div class="bread-tag">
+                      <span class="bread-text">${bread}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="arrow">
+                <svg class="icon icon-lg" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    renderFavorites();
+  </script>
+</body>
+</html>
+

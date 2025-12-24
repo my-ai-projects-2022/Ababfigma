@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .login-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+      padding: 20px;
+    }
+
+    .login-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 16px;
+      position: relative;
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    .login-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .login-modal-body {
+      padding: 32px 24px 24px;
+      text-align: center;
+    }
+
+    .login-modal-icon {
+      margin: 0 auto 20px;
+      width: 80px;
+      height: 80px;
+    }
+
+    .login-modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 12px;
+    }
+
+    .login-modal-message {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .login-modal-features {
+      text-align: left;
+      background-color: var(--color-bg);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .login-feature-item {
+      font-size: 14px;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    .login-feature-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .login-modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .login-modal-cancel,
+    .login-modal-confirm {
+      flex: 1;
+      height: 44px;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .login-modal-cancel {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+    }
+
+    .login-modal-confirm {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .login-modal-confirm:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="login-modal-content">
+      <button class="login-modal-close" onclick="window.history.back()">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="login-modal-body">
+        <div class="login-modal-icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="28" r="16" fill="#E67E22"/>
+            <path d="M16 72C16 56.536 26.746 44 40 44C53.254 44 64 56.536 64 72" stroke="#E67E22" strokeWidth="4" fill="none"/>
+          </svg>
+        </div>
+
+        <h2 class="login-modal-title">欢迎来到面包工坊</h2>
+        <p class="login-modal-message">
+          登录后可以享受更多服务
+        </p>
+
+        <div class="login-modal-features">
+          <div class="login-feature-item">✓ 收藏喜欢的主理人</div>
+          <div class="login-feature-item">✓ 喜欢心仪的面包</div>
+          <div class="login-feature-item">✓ 管理收货地址</div>
+          <div class="login-feature-item">✓ 问题反馈与咨询</div>
+        </div>
+
+        <div class="login-modal-actions">
+          <button class="login-modal-cancel" onclick="window.history.back()">取消</button>
+          <button class="login-modal-confirm" onclick="handleLogin()">授权登录</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleLogin() {
+      alert('跳转到登录页');
+      window.history.back();
+    }
+  </script>
+</body>
+</html>
+

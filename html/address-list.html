@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的地址 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .address-list-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .page-back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-header-action {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .address-list-content {
+      padding: 12px 0;
+    }
+
+    .address-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px;
+    }
+
+    .address-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .address-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .address-card-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .address-user-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .address-user-gender {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .address-user-phone {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .address-default-tag {
+      padding: 4px 12px;
+      background-color: var(--color-primary);
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .address-card-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .address-icon {
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .address-text {
+      font-size: 14px;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    .address-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .address-tag {
+      padding: 4px 12px;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .address-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .address-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .address-action-btn.edit {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+    }
+
+    .address-action-btn.delete {
+      background-color: #FFEBEE;
+      color: var(--color-error);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      color: var(--color-border);
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-hint {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="address-list-page">
+    <div class="page-header">
+      <button class="page-back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title">我的地址</h1>
+      <button class="page-header-action" onclick="window.location.href='address-edit.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="address-list-content">
+      <div class="address-list" id="addressList">
+        <!-- 动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const addresses = [
+      {
+        id: '1',
+        name: '张三',
+        phone: '13800138000',
+        gender: 'male',
+        address: '四川省成都市武侯区桐梓林',
+        doorNumber: '1栋2单元301室',
+        tag: '家',
+        isDefault: true,
+      },
+    ];
+
+    function renderAddresses() {
+      const container = document.getElementById('addressList');
+      if (addresses.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg class="icon icon-xl empty-icon" viewBox="0 0 24 24">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <p class="empty-text">暂无地址</p>
+            <p class="empty-hint">点击右上角添加新地址</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = addresses.map(address => `
+        <div class="address-card">
+          <div class="address-card-header">
+            <div class="address-card-user">
+              <span class="address-user-name">${address.name}</span>
+              <span class="address-user-gender">${address.gender === 'male' ? '先生' : '女士'}</span>
+              <span class="address-user-phone">${address.phone}</span>
+            </div>
+            ${address.isDefault ? '<span class="address-default-tag">默认</span>' : ''}
+          </div>
+          <div class="address-card-detail">
+            <svg class="icon icon-sm address-icon" viewBox="0 0 24 24">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="address-text">${address.address} ${address.doorNumber}</span>
+          </div>
+          <div class="address-card-footer">
+            <span class="address-tag">${address.tag}</span>
+            <div class="address-actions">
+              <button class="address-action-btn edit" onclick="editAddress('${address.id}')">
+                <svg class="icon icon-sm" viewBox="0 0 24 24">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                <span>编辑</span>
+              </button>
+              <button class="address-action-btn delete" onclick="deleteAddress('${address.id}')">
+                <svg class="icon icon-sm" viewBox="0 0 24 24">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                <span>删除</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editAddress(id) {
+      window.location.href = `address-edit.html?id=${id}`;
+    }
+
+    function deleteAddress(id) {
+      if (confirm('确定要删除这个地址吗？')) {
+        const index = addresses.findIndex(addr => addr.id === id);
+        if (index > -1) {
+          addresses.splice(index, 1);
+          renderAddresses();
+        }
+      }
+    }
+
+    renderAddresses();
+  </script>
+</body>
+</html>
+

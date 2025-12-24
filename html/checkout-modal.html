@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>结算 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .checkout-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+      padding: 20px;
+    }
+
+    .checkout-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 16px;
+      position: relative;
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    .checkout-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .checkout-modal-body {
+      padding: 24px;
+    }
+
+    .checkout-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .checkout-amount {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background-color: var(--color-bg);
+      border-radius: 12px;
+    }
+
+    .checkout-amount-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .checkout-amount-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .checkout-qrcode {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .qrcode-image {
+      width: 133px;
+      height: 133px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+    }
+
+    .qrcode-hint {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+
+    .checkout-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+      background-color: #FFF3E0;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .notice-icon {
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .notice-desc {
+      flex: 1;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .checkout-note {
+      margin-bottom: 16px;
+    }
+
+    .note-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .note-input {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .note-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .note-counter {
+      text-align: right;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      margin-top: 4px;
+    }
+
+    .checkout-complete-btn {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .checkout-complete-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="checkout-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="checkout-modal-content">
+      <button class="checkout-modal-close" onclick="window.history.back()">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="checkout-modal-body">
+        <h2 class="checkout-modal-title">付款给 麦田工坊</h2>
+        
+        <div class="checkout-amount">
+          <span class="checkout-amount-label">应付金额</span>
+          <span class="checkout-amount-value" id="totalAmount">¥48.00</span>
+        </div>
+
+        <div class="checkout-qrcode">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=payment" alt="收款二维码" class="qrcode-image" />
+          <p class="qrcode-hint">使用微信/支付宝扫描二维码付款</p>
+        </div>
+
+        <div class="checkout-notice">
+          <svg class="icon icon-sm notice-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <p class="notice-desc">暂不支持直接付款，请扫码支付后点击"付款完成"按钮</p>
+        </div>
+
+        <div class="checkout-note">
+          <label class="note-label">备注</label>
+          <textarea
+            class="note-input"
+            id="noteInput"
+            placeholder="选填，最多200个字符"
+            maxlength="200"
+          ></textarea>
+          <div class="note-counter">
+            <span id="noteCount">0</span>/200
+          </div>
+        </div>
+
+        <button class="checkout-complete-btn" onclick="completePayment()">
+          付款完成
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateNoteCount() {
+      const input = document.getElementById('noteInput');
+      const count = document.getElementById('noteCount');
+      count.textContent = input.value.length;
+    }
+
+    function completePayment() {
+      if (confirm('确认已完成付款？')) {
+        alert('订单已创建，跳转到订单页面');
+        window.location.href = 'orders.html';
+      }
+    }
+
+    document.getElementById('noteInput').addEventListener('input', updateNoteCount);
+  </script>
+</body>
+</html>
+

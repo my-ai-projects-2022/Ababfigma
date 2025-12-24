@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑主理人信息 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .edit-baker-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+      padding: 20px;
+    }
+
+    .edit-baker-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 340px;
+      max-height: 90vh;
+      border-radius: 16px;
+      position: relative;
+      animation: scaleIn 0.3s ease-out;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .edit-baker-modal-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--color-border);
+      position: relative;
+    }
+
+    .edit-baker-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      text-align: center;
+    }
+
+    .edit-baker-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .edit-baker-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .bread-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .bread-tag-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      background-color: white;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .bread-tag-btn.selected {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .error-message {
+      font-size: 12px;
+      color: var(--color-error);
+      margin-top: 4px;
+    }
+
+    .edit-baker-modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .edit-baker-submit-btn {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .edit-baker-submit-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="edit-baker-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="edit-baker-modal-content">
+      <div class="edit-baker-modal-header">
+        <h2 class="edit-baker-modal-title">编辑主理人信息</h2>
+        <button class="edit-baker-modal-close" onclick="window.history.back()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="edit-baker-modal-body">
+        <div class="form-group">
+          <label class="form-label">主理人名称</label>
+          <input type="text" class="form-input" id="bakerName" value="我的面包工坊" />
+          <div class="error-message hidden" id="nameError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">主营面包</label>
+          <div class="bread-tags-container" id="breadTags">
+            <!-- 动态渲染 -->
+          </div>
+          <div class="error-message hidden" id="breadsError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">地址</label>
+          <input type="text" class="form-input" id="bakerAddress" value="四川省成都市武侯区桐梓林" />
+          <div class="error-message hidden" id="addressError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">联系电话</label>
+          <input type="tel" class="form-input" id="bakerPhone" value="13800138000" maxlength="11" />
+          <div class="error-message hidden" id="phoneError"></div>
+        </div>
+      </div>
+
+      <div class="edit-baker-modal-footer">
+        <button class="edit-baker-submit-btn" onclick="submitForm()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const breadTypes = ['法棍', '可颂', '吐司', '欧包', '软欧包', '贝果', '丹麦酥', '牛角包', '司康', '全麦面包'];
+    const selectedBreads = ['法棍', '可颂', '欧包', '软欧包'];
+
+    function renderBreadTags() {
+      const container = document.getElementById('breadTags');
+      container.innerHTML = breadTypes.map(bread => `
+        <button class="bread-tag-btn ${selectedBreads.includes(bread) ? 'selected' : ''}" 
+          onclick="toggleBread('${bread}')" id="tag-${bread}">
+          ${bread}
+        </button>
+      `).join('');
+    }
+
+    function toggleBread(bread) {
+      const index = selectedBreads.indexOf(bread);
+      const btn = document.getElementById(`tag-${bread}`);
+      
+      if (index > -1) {
+        selectedBreads.splice(index, 1);
+        btn.classList.remove('selected');
+      } else {
+        selectedBreads.push(bread);
+        btn.classList.add('selected');
+      }
+    }
+
+    function validateForm() {
+      const name = document.getElementById('bakerName').value.trim();
+      const address = document.getElementById('bakerAddress').value.trim();
+      const phone = document.getElementById('bakerPhone').value.trim();
+
+      let isValid = true;
+
+      if (!name) {
+        showError('nameError', '请输入主理人名称');
+        isValid = false;
+      } else {
+        hideError('nameError');
+      }
+
+      if (selectedBreads.length === 0) {
+        showError('breadsError', '请至少选择一种面包');
+        isValid = false;
+      } else {
+        hideError('breadsError');
+      }
+
+      if (!address) {
+        showError('addressError', '请输入地址');
+        isValid = false;
+      } else {
+        hideError('addressError');
+      }
+
+      if (!phone) {
+        showError('phoneError', '请输入联系电话');
+        isValid = false;
+      } else if (!/^1[3-9]\d{9}$/.test(phone)) {
+        showError('phoneError', '请输入正确的手机号');
+        isValid = false;
+      } else {
+        hideError('phoneError');
+      }
+
+      return isValid;
+    }
+
+    function showError(id, message) {
+      const errorEl = document.getElementById(id);
+      errorEl.textContent = message;
+      errorEl.classList.remove('hidden');
+    }
+
+    function hideError(id) {
+      const errorEl = document.getElementById(id);
+      errorEl.classList.add('hidden');
+    }
+
+    function submitForm() {
+      if (validateForm()) {
+        alert('主理人信息已更新');
+        window.history.back();
+      }
+    }
+
+    renderBreadTags();
+  </script>
+</body>
+</html>
+

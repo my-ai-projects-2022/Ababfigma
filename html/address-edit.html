@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑地址 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .address-edit-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .page-back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-header-spacer {
+      width: 40px;
+    }
+
+    .address-edit-content {
+      padding: 16px;
+    }
+
+    .address-edit-form {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .form-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-textarea:focus {
+      border-color: var(--color-primary);
+    }
+
+    .gender-options {
+      display: flex;
+      gap: 12px;
+    }
+
+    .gender-option {
+      flex: 1;
+      height: 40px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      background-color: white;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .gender-option.active {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .address-input-group {
+      position: relative;
+    }
+
+    .paste-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .tag-options {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag-option {
+      padding: 8px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      background-color: white;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .tag-option.active {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+
+    .custom-tag-input {
+      margin-top: 8px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      cursor: pointer;
+    }
+
+    .form-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .address-edit-footer {
+      padding: 0 16px 16px;
+    }
+
+    .save-address-btn {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .save-address-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="address-edit-page">
+    <div class="page-header">
+      <button class="page-back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title" id="pageTitle">新建地址</h1>
+      <div class="page-header-spacer"></div>
+    </div>
+
+    <div class="address-edit-content">
+      <div class="address-edit-form">
+        <div class="form-group">
+          <label class="form-label">联系人</label>
+          <input type="text" class="form-input" id="nameInput" placeholder="请输入姓名" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">性别</label>
+          <div class="gender-options">
+            <button class="gender-option active" id="maleBtn" onclick="setGender('male')">先生</button>
+            <button class="gender-option" id="femaleBtn" onclick="setGender('female')">女士</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">手机号</label>
+          <input type="tel" class="form-input" id="phoneInput" placeholder="请输入手机号" maxlength="11" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">地址</label>
+          <div class="address-input-group">
+            <textarea class="form-textarea" id="addressInput" placeholder="请输入详细地址" rows="3"></textarea>
+            <button class="paste-btn" onclick="pasteAddress()">
+              <svg class="icon icon-sm" viewBox="0 0 24 24">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+              <span>粘贴</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">门牌号</label>
+          <input type="text" class="form-input" id="doorNumberInput" placeholder="如：1栋2单元301室" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <div class="tag-options">
+            <button class="tag-option" onclick="setTag('公司')" id="tag-公司">公司</button>
+            <button class="tag-option active" onclick="setTag('家')" id="tag-家">家</button>
+            <button class="tag-option" onclick="setTag('学校')" id="tag-学校">学校</button>
+          </div>
+          <input type="text" class="form-input custom-tag-input" id="customTagInput" placeholder="自定义标签" />
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" class="form-checkbox" id="isDefaultCheckbox" />
+            <span>设为默认地址</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="address-edit-footer">
+        <button class="save-address-btn" onclick="saveAddress()">保存地址</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const addressId = urlParams.get('id');
+    let selectedGender = 'male';
+    let selectedTag = '家';
+
+    if (addressId) {
+      document.getElementById('pageTitle').textContent = '编辑地址';
+      // 加载地址数据
+      document.getElementById('nameInput').value = '张三';
+      document.getElementById('phoneInput').value = '13800138000';
+      document.getElementById('addressInput').value = '四川省成都市武侯区桐梓林';
+      document.getElementById('doorNumberInput').value = '1栋2单元301室';
+      document.getElementById('isDefaultCheckbox').checked = true;
+    }
+
+    function setGender(gender) {
+      selectedGender = gender;
+      document.getElementById('maleBtn').classList.toggle('active', gender === 'male');
+      document.getElementById('femaleBtn').classList.toggle('active', gender === 'female');
+    }
+
+    function setTag(tag) {
+      selectedTag = tag;
+      document.querySelectorAll('.tag-option').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`tag-${tag}`).classList.add('active');
+      document.getElementById('customTagInput').value = '';
+    }
+
+    async function pasteAddress() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('addressInput').value = text;
+      } catch (err) {
+        alert('粘贴失败，请手动输入地址');
+      }
+    }
+
+    function saveAddress() {
+      const name = document.getElementById('nameInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+      const address = document.getElementById('addressInput').value.trim();
+      const doorNumber = document.getElementById('doorNumberInput').value.trim();
+      const customTag = document.getElementById('customTagInput').value.trim();
+      const isDefault = document.getElementById('isDefaultCheckbox').checked;
+
+      if (!name) {
+        alert('请输入联系人姓名');
+        return;
+      }
+      if (!phone) {
+        alert('请输入手机号');
+        return;
+      }
+      if (!/^1[3-9]\d{9}$/.test(phone)) {
+        alert('请输入正确的手机号');
+        return;
+      }
+      if (!address) {
+        alert('请输入地址');
+        return;
+      }
+      if (!doorNumber) {
+        alert('请输入门牌号');
+        return;
+      }
+
+      const finalTag = customTag || selectedTag || '其他';
+      alert('地址已保存');
+      window.history.back();
+    }
+  </script>
+</body>
+</html>
+

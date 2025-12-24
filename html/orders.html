@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的订单 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .order-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .order-view-toggle {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      display: flex;
+      gap: 0;
+      background-color: white;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 99;
+    }
+
+    .order-toggle-btn {
+      flex: 1;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    .order-toggle-btn.active {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .order-toggle-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .order-list-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 44px;
+      padding-bottom: 80px;
+    }
+
+    .order-list,
+    .baker-order-list {
+      padding: 12px 16px;
+    }
+
+    .order-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .order-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .order-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .order-status.status-pending {
+      background-color: #FFF3E0;
+      color: var(--color-primary);
+    }
+
+    .order-status.status-completed {
+      background-color: #E8F5E9;
+      color: var(--color-success);
+    }
+
+    .order-status.status-cancelled {
+      background-color: #FFEBEE;
+      color: var(--color-error);
+    }
+
+    .order-baker-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .order-baker-avatar {
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .order-baker-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .order-divider {
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      height: 1px;
+      background-color: var(--color-border);
+      margin-bottom: 12px;
+    }
+
+    .order-info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+    }
+
+    .order-info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .order-info-label {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .order-info-value {
+      font-size: 13px;
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+
+    .order-breads-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .order-bread-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+    }
+
+    .order-bread-image-wrapper {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      overflow: hidden;
+      border-radius: 6px;
+      background-color: var(--color-bg);
+      flex-shrink: 0;
+    }
+
+    .order-bread-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-bread-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .order-bread-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .order-bread-price {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .order-bread-quantity {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .order-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+      gap: 12px;
+    }
+
+    .order-total {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .order-total-label {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .order-total-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .order-review-btn {
+      padding: 6px 20px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .order-review-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .baker-order-card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .baker-order-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .baker-order-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .baker-order-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .baker-order-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .baker-order-stats {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .baker-order-stats-num {
+      font-weight: 700;
+      color: var(--color-primary-light);
+    }
+
+    .baker-divider {
+      width: calc(100% + 32px);
+      margin-left: -16px;
+      height: 1px;
+      background-color: var(--color-border);
+      margin-bottom: 12px;
+    }
+
+    .baker-orders-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .baker-bread-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+    }
+
+    .baker-bread-info-block {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .baker-bread-image-wrapper {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      overflow: hidden;
+      border-radius: 6px;
+      background-color: var(--color-bg);
+      flex-shrink: 0;
+    }
+
+    .baker-bread-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .baker-bread-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .baker-bread-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .baker-bread-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .baker-bread-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .baker-bread-quantity {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .baker-bread-order-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .baker-bread-order-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .baker-bread-order-label {
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .baker-bread-order-value {
+      color: var(--color-text-primary);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .baker-bread-order-status {
+      font-weight: 600;
+    }
+
+    .baker-bread-order-status.status-pending {
+      color: var(--color-primary);
+    }
+
+    .baker-bread-order-status.status-completed {
+      color: var(--color-success);
+    }
+
+    .baker-bread-order-status.status-cancelled {
+      color: var(--color-error);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 375px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      height: 64px;
+      background-color: #FFFFFF;
+      border-top: 1px solid var(--color-border);
+      z-index: 999;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 100%;
+      transition: all 0.3s;
+      color: var(--color-text-secondary);
+    }
+
+    .nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .nav-text {
+      font-size: 12px;
+    }
+
+    .nav-item.active .nav-text {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="order-page">
+    <!-- 视图切换 -->
+    <div class="order-view-toggle">
+      <button class="order-toggle-btn active" id="orderBtn" onclick="toggleView('order')">
+        按订单
+      </button>
+      <button class="order-toggle-btn" id="bakerBtn" onclick="toggleView('baker')">
+        按主理人
+      </button>
+    </div>
+
+    <!-- 订单列表 -->
+    <div class="order-list-container">
+      <!-- 按订单维度 -->
+      <div class="order-list" id="orderView">
+        <div id="orderList"></div>
+      </div>
+
+      <!-- 按主理人维度 -->
+      <div class="baker-order-list hidden" id="bakerView">
+        <div id="bakerOrderList"></div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="window.location.href='index.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="nav-text">首页</span>
+      </button>
+      <button class="nav-item active" onclick="window.location.href='orders.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+          <path d="M3 6h18"></path>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <span class="nav-text">订单</span>
+      </button>
+      <button class="nav-item" onclick="window.location.href='profile.html'">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span class="nav-text">我的</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 模拟订单数据
+    const orders = [
+      {
+        id: 'order-1',
+        orderNumber: 'BW202401150001',
+        status: 'pending',
+        bakerId: '1',
+        bakerName: '麦田工坊',
+        bakerAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200',
+        orderTime: '1月15日 10:30',
+        estimatedTime: '明天 09:00',
+        breads: [
+          { id: '1', name: '经典法棍', price: 18.00, quantity: 2, image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400' },
+          { id: '2', name: '牛角可颂', price: 12.00, quantity: 1, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400' },
+        ],
+        totalPrice: 48.00,
+      },
+      {
+        id: 'order-2',
+        orderNumber: 'BW202401140002',
+        status: 'completed',
+        bakerId: '3',
+        bakerName: '阿雅烘焙坊',
+        bakerAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+        orderTime: '1月14日 14:20',
+        breads: [
+          { id: '3', name: '全麦软欧包', price: 22.00, quantity: 1, image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400' },
+        ],
+        totalPrice: 22.00,
+      },
+    ];
+
+    // 按主理人分组
+    const bakerOrders = {};
+    orders.forEach(order => {
+      if (!bakerOrders[order.bakerId]) {
+        bakerOrders[order.bakerId] = {
+          bakerId: order.bakerId,
+          bakerName: order.bakerName,
+          bakerAvatar: order.bakerAvatar,
+          orders: [],
+          totalOrders: 0,
+          totalAmount: 0,
+        };
+      }
+      bakerOrders[order.bakerId].orders.push(order);
+      bakerOrders[order.bakerId].totalOrders++;
+      bakerOrders[order.bakerId].totalAmount += order.totalPrice;
+    });
+
+    let viewMode = 'order';
+
+    function getStatusInfo(status) {
+      const statusMap = {
+        pending: { text: '进行中', class: 'status-pending', icon: '⏰' },
+        completed: { text: '已完成', class: 'status-completed', icon: '✓' },
+        cancelled: { text: '已取消', class: 'status-cancelled', icon: '✕' },
+      };
+      return statusMap[status] || statusMap.pending;
+    }
+
+    function renderOrders() {
+      const container = document.getElementById('orderList');
+      container.innerHTML = orders.map(order => {
+        const statusInfo = getStatusInfo(order.status);
+        return `
+          <div class="order-card">
+            <div class="order-card-header">
+              <div class="order-status ${statusInfo.class}">
+                <span>${statusInfo.icon}</span>
+                <span>${statusInfo.text}</span>
+                ${order.status === 'pending' && order.estimatedTime ? `
+                  <span style="margin-left: 4px; opacity: 0.8; font-size: 11px;">预计 ${order.estimatedTime}</span>
+                ` : ''}
+              </div>
+              <div class="order-baker-info" onclick="window.location.href='baker-detail.html?id=${order.bakerId}'">
+                <img src="${order.bakerAvatar}" alt="${order.bakerName}" class="order-baker-avatar" />
+                <span class="order-baker-name">${order.bakerName}</span>
+              </div>
+            </div>
+            <div class="order-divider"></div>
+            <div class="order-info-section">
+              <div class="order-info-row">
+                <span class="order-info-label">订单编号</span>
+                <span class="order-info-value">${order.orderNumber}</span>
+              </div>
+              <div class="order-info-row">
+                <span class="order-info-label">下单时间</span>
+                <span class="order-info-value">${order.orderTime}</span>
+              </div>
+            </div>
+            <div class="order-breads-list">
+              ${order.breads.map(bread => `
+                <div class="order-bread-item">
+                  <div class="order-bread-image-wrapper">
+                    <img src="${bread.image}" alt="${bread.name}" class="order-bread-image" />
+                  </div>
+                  <div class="order-bread-info">
+                    <div class="order-bread-name">${bread.name}</div>
+                    <div class="order-bread-price">¥${bread.price.toFixed(2)}</div>
+                  </div>
+                  <div class="order-bread-quantity">x${bread.quantity}</div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="order-footer">
+              <div class="order-total">
+                <span class="order-total-label">订单总额</span>
+                <span class="order-total-price">¥${order.totalPrice.toFixed(2)}</span>
+              </div>
+              ${order.status === 'completed' ? `
+                <button class="order-review-btn" onclick="openReview('${order.id}')">评价</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderBakerOrders() {
+      const container = document.getElementById('bakerOrderList');
+      container.innerHTML = Object.values(bakerOrders).map(bakerOrder => {
+        return `
+          <div class="baker-order-card">
+            <div class="baker-order-header" onclick="window.location.href='baker-detail.html?id=${bakerOrder.bakerId}'">
+              <img src="${bakerOrder.bakerAvatar}" alt="${bakerOrder.bakerName}" class="baker-order-avatar" />
+              <div class="baker-order-info">
+                <div class="baker-order-name">${bakerOrder.bakerName}</div>
+                <div class="baker-order-stats">
+                  共<span class="baker-order-stats-num">${bakerOrder.totalOrders}</span>单 · 累计¥<span class="baker-order-stats-num">${bakerOrder.totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="baker-divider"></div>
+            <div class="baker-orders-container">
+              ${bakerOrder.orders.map(order => {
+                const statusInfo = getStatusInfo(order.status);
+                return order.breads.map(bread => `
+                  <div class="baker-bread-card">
+                    <div class="baker-bread-info-block">
+                      <div class="baker-bread-image-wrapper">
+                        <img src="${bread.image}" alt="${bread.name}" class="baker-bread-image" />
+                      </div>
+                      <div class="baker-bread-details">
+                        <div class="baker-bread-name">${bread.name}</div>
+                        <div class="baker-bread-meta">
+                          <span class="baker-bread-price">¥${bread.price.toFixed(2)}</span>
+                          <span class="baker-bread-quantity">x${bread.quantity}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="baker-bread-order-section">
+                      <div class="baker-bread-order-info">
+                        <span class="baker-bread-order-label">订单编号</span>
+                        <span class="baker-bread-order-value">${order.orderNumber}</span>
+                      </div>
+                      <div class="baker-bread-order-info">
+                        <span class="baker-bread-order-label">下单时间</span>
+                        <span class="baker-bread-order-value">${order.orderTime}</span>
+                      </div>
+                      <div class="baker-bread-order-info">
+                        <span class="baker-bread-order-label">订单状态</span>
+                        <span class="baker-bread-order-status ${statusInfo.class}">${statusInfo.text}</span>
+                      </div>
+                    </div>
+                  </div>
+                `).join('');
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleView(mode) {
+      viewMode = mode;
+      const orderView = document.getElementById('orderView');
+      const bakerView = document.getElementById('bakerView');
+      const orderBtn = document.getElementById('orderBtn');
+      const bakerBtn = document.getElementById('bakerBtn');
+
+      if (mode === 'order') {
+        orderView.classList.remove('hidden');
+        bakerView.classList.add('hidden');
+        orderBtn.classList.add('active');
+        bakerBtn.classList.remove('active');
+      } else {
+        orderView.classList.add('hidden');
+        bakerView.classList.remove('hidden');
+        orderBtn.classList.remove('active');
+        bakerBtn.classList.add('active');
+      }
+    }
+
+    function openReview(orderId) {
+      window.location.href = `review-modal.html?orderId=${orderId}`;
+    }
+
+    // 初始化
+    renderOrders();
+    renderBakerOrders();
+  </script>
+</body>
+</html>
+

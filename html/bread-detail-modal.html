@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面包详情 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .bread-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .bread-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 375px;
+      max-height: 90vh;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.3s ease-out;
+      position: relative;
+    }
+
+    .bread-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .bread-modal-images {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      overflow: hidden;
+      background-color: var(--color-bg);
+    }
+
+    .bread-modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bread-modal-info {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .bread-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .bread-modal-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      flex: 1;
+    }
+
+    .bread-modal-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .bread-modal-hot-badge {
+      display: inline-flex;
+      padding: 4px 12px;
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .bread-modal-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .bread-modal-description {
+      margin-bottom: 16px;
+    }
+
+    .bread-modal-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+
+    .bread-modal-description-text {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .bread-modal-stats {
+      display: flex;
+      gap: 16px;
+      padding: 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+    }
+
+    .bread-modal-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-label-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--color-text-primary);
+    }
+
+    .stat-value-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary-light);
+    }
+
+    .bread-modal-footer {
+      padding: 16px;
+      border-top: 1px solid var(--color-border);
+      background-color: white;
+    }
+
+    .bread-modal-want-btn {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .bread-modal-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .bread-modal-minus,
+    .bread-modal-plus {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .bread-modal-input {
+      flex: 1;
+      height: 44px;
+      text-align: center;
+      border: 2px solid var(--color-border);
+      border-radius: 22px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      background-color: var(--color-bg);
+      outline: none;
+    }
+
+    .bread-modal-input:focus {
+      border-color: var(--color-primary);
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="bread-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="bread-modal-content">
+      <button class="bread-modal-close" onclick="window.history.back()">
+        <svg class="icon" viewBox="0 0 24 24" style="color: white;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="bread-modal-images">
+        <img id="breadImage" src="" alt="" class="bread-modal-image" />
+      </div>
+
+      <div class="bread-modal-info">
+        <div class="bread-modal-header">
+          <h2 class="bread-modal-name" id="breadName"></h2>
+          <div class="bread-modal-price" id="breadPrice"></div>
+        </div>
+
+        <div id="hotBadge" class="hidden">
+          <div class="bread-modal-hot-badge">🔥 热卖商品</div>
+        </div>
+
+        <div class="bread-modal-tags" id="breadTags"></div>
+
+        <div class="bread-modal-description">
+          <h3 class="bread-modal-section-title">商品介绍</h3>
+          <p class="bread-modal-description-text" id="breadDescription"></p>
+        </div>
+
+        <div class="bread-modal-stats">
+          <div class="bread-modal-stat">
+            <span class="stat-label-text">已售</span>
+            <span class="stat-value-text" id="soldCount"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bread-modal-footer">
+        <div id="wantBtnContainer">
+          <button class="bread-modal-want-btn" onclick="addToCart()">想吃</button>
+        </div>
+        <div id="quantityControls" class="hidden bread-modal-controls">
+          <button class="bread-modal-minus" onclick="removeFromCart()">
+            <svg class="icon" viewBox="0 0 24 24">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+          <input type="text" class="bread-modal-input" id="quantityInput" value="1" onchange="updateQuantity(this.value)" />
+          <button class="bread-modal-plus" onclick="addToCart()">
+            <svg class="icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const breadId = urlParams.get('breadId') || '1';
+
+    const breadData = {
+      id: '1',
+      name: '经典法棍',
+      image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400',
+      price: 18.00,
+      isHot: true,
+      isPurchased: true,
+      category: '咸面包',
+      tags: ['健康', '长时间发酵'],
+      description: '传统法式工艺，72小时低温发酵，外脆内软',
+      soldCount: 128,
+    };
+
+    let quantity = 0;
+
+    function renderBread() {
+      document.getElementById('breadImage').src = breadData.image;
+      document.getElementById('breadName').textContent = breadData.name;
+      document.getElementById('breadPrice').textContent = `¥${breadData.price.toFixed(2)}`;
+      document.getElementById('breadDescription').textContent = breadData.description;
+      document.getElementById('soldCount').textContent = breadData.soldCount;
+
+      if (breadData.isHot) {
+        document.getElementById('hotBadge').classList.remove('hidden');
+      }
+
+      const tagsContainer = document.getElementById('breadTags');
+      tagsContainer.innerHTML = `
+        ${breadData.isPurchased ? '<div class="detail-purchased-tag">购买过</div>' : ''}
+        <div class="detail-bread-category category-${breadData.category === '甜面包' ? 'sweet' : 'savory'}">${breadData.category}</div>
+        ${breadData.tags.map(tag => `<div class="detail-bread-tag">${tag}</div>`).join('')}
+      `;
+
+      updateQuantityDisplay();
+    }
+
+    function updateQuantityDisplay() {
+      const wantBtnContainer = document.getElementById('wantBtnContainer');
+      const quantityControls = document.getElementById('quantityControls');
+      const quantityInput = document.getElementById('quantityInput');
+
+      if (quantity === 0) {
+        wantBtnContainer.classList.remove('hidden');
+        quantityControls.classList.add('hidden');
+      } else {
+        wantBtnContainer.classList.add('hidden');
+        quantityControls.classList.remove('hidden');
+        quantityInput.value = quantity;
+      }
+    }
+
+    function addToCart() {
+      quantity++;
+      updateQuantityDisplay();
+    }
+
+    function removeFromCart() {
+      if (quantity > 0) {
+        quantity--;
+        updateQuantityDisplay();
+      }
+    }
+
+    function updateQuantity(value) {
+      const numValue = parseInt(value, 10);
+      if (!isNaN(numValue) && numValue >= 0) {
+        quantity = numValue;
+        updateQuantityDisplay();
+      }
+    }
+
+    renderBread();
+  </script>
+</body>
+</html>
+

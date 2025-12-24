@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑面包 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .bread-edit-modal-overlay {
+      z-index: 2000;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: flex-end;
+      animation: fadeIn 0.3s ease-out;
+      display: flex;
+      position: fixed;
+      inset: 0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .bread-edit-modal-content {
+      background-color: #fff;
+      border-radius: 24px 24px 0 0;
+      flex-direction: column;
+      width: 100%;
+      max-width: 375px;
+      max-height: 85vh;
+      animation: slideUp 0.3s ease-out;
+      display: flex;
+      position: relative;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .bread-edit-modal-header {
+      border-bottom: 1px solid var(--color-border);
+      padding: 20px;
+      position: relative;
+    }
+
+    .bread-edit-modal-title {
+      color: var(--color-text-primary);
+      text-align: center;
+      padding-right: 32px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .bread-edit-modal-close {
+      background-color: var(--color-bg);
+      width: 32px;
+      height: 32px;
+      color: var(--color-text-secondary);
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+      transition: background-color .2s;
+      display: flex;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-edit-modal-close:hover {
+      background-color: var(--color-border);
+    }
+
+    .bread-edit-modal-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .bread-edit-field {
+      margin-bottom: 20px;
+    }
+
+    .bread-edit-field:last-child {
+      margin-bottom: 0;
+    }
+
+    .bread-edit-label {
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+    }
+
+    .bread-edit-image-upload {
+      border: 2px dashed var(--color-border);
+      cursor: pointer;
+      border-radius: 12px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 200px;
+      transition: border-color .2s;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .bread-edit-image-upload:hover {
+      border-color: var(--color-primary);
+    }
+
+    .bread-edit-image-preview {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bread-edit-image-placeholder {
+      color: var(--color-text-secondary);
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      display: flex;
+    }
+
+    .bread-edit-image-placeholder span {
+      font-size: 14px;
+    }
+
+    .bread-edit-input {
+      border: 1px solid var(--color-border);
+      width: 100%;
+      color: var(--color-text-primary);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 15px;
+      transition: border-color .2s;
+      box-sizing: border-box;
+    }
+
+    .bread-edit-input:focus {
+      border-color: var(--color-primary);
+      outline: none;
+    }
+
+    .bread-edit-textarea {
+      border: 1px solid var(--color-border);
+      width: 100%;
+      color: var(--color-text-primary);
+      resize: vertical;
+      border-radius: 8px;
+      min-height: 80px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      transition: border-color .2s;
+      box-sizing: border-box;
+    }
+
+    .bread-edit-textarea:focus {
+      border-color: var(--color-primary);
+      outline: none;
+    }
+
+    .bread-edit-modal-footer {
+      border-top: 1px solid var(--color-border);
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      display: flex;
+    }
+
+    .bread-edit-delete-btn {
+      color: #e74c3c;
+      background-color: rgba(231, 76, 60, 0.1);
+      border-radius: 20px;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .2s;
+      display: flex;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-edit-delete-btn:hover {
+      background-color: rgba(231, 76, 60, 0.2);
+    }
+
+    .bread-edit-actions {
+      flex: 1;
+      justify-content: flex-end;
+      gap: 8px;
+      display: flex;
+    }
+
+    .bread-edit-cancel-btn {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-edit-cancel-btn:hover {
+      background-color: var(--color-border);
+    }
+
+    .bread-edit-save-btn {
+      background-color: var(--color-primary);
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-edit-save-btn:hover {
+      background-color: var(--color-primary-dark);
+    }
+
+    .bread-delete-confirm-overlay {
+      z-index: 3000;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+      display: flex;
+      position: fixed;
+      inset: 0;
+    }
+
+    .bread-delete-confirm-dialog {
+      background-color: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 320px;
+      padding: 24px;
+      animation: scaleIn 0.2s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .bread-delete-confirm-title {
+      color: var(--color-text-primary);
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .bread-delete-confirm-message {
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .bread-delete-confirm-actions {
+      gap: 12px;
+      display: flex;
+    }
+
+    .bread-delete-confirm-cancel {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      border-radius: 20px;
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-delete-confirm-cancel:hover {
+      background-color: var(--color-border);
+    }
+
+    .bread-delete-confirm-delete {
+      color: #fff;
+      background-color: #e74c3c;
+      border-radius: 20px;
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .bread-delete-confirm-delete:hover {
+      background-color: #c0392b;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="bread-edit-modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="bread-edit-modal-content">
+      <div class="bread-edit-modal-header">
+        <div class="bread-edit-modal-title" id="modalTitle">添加面包</div>
+        <button class="bread-edit-modal-close" onclick="closeModal()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="bread-edit-modal-body">
+        <div class="bread-edit-field">
+          <label class="bread-edit-label">面包图片</label>
+          <div class="bread-edit-image-upload" onclick="document.getElementById('imageInput').click()">
+            <img id="imagePreview" class="bread-edit-image-preview hidden" alt="预览" />
+            <div class="bread-edit-image-placeholder" id="imagePlaceholder">
+              <svg class="icon icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>点击上传图片</span>
+            </div>
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/*"
+              onchange="handleImageUpload(event)"
+              style="display: none"
+            />
+          </div>
+        </div>
+
+        <div class="bread-edit-field">
+          <label class="bread-edit-label">面包名称</label>
+          <input
+            type="text"
+            id="breadName"
+            value=""
+            placeholder="例如：经典法棍"
+            class="bread-edit-input"
+          />
+        </div>
+
+        <div class="bread-edit-field">
+          <label class="bread-edit-label">价格（元）</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            id="breadPrice"
+            value=""
+            placeholder="例如：18.00"
+            class="bread-edit-input"
+          />
+        </div>
+
+        <div class="bread-edit-field">
+          <label class="bread-edit-label">每日限量</label>
+          <input
+            type="number"
+            min="1"
+            id="dailyLimit"
+            value=""
+            placeholder="例如：20"
+            class="bread-edit-input"
+          />
+        </div>
+
+        <div class="bread-edit-field">
+          <label class="bread-edit-label">面包描述</label>
+          <textarea
+            id="breadDescription"
+            placeholder="介绍一下这款面包的特色..."
+            class="bread-edit-textarea"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="bread-edit-modal-footer">
+        <button class="bread-edit-delete-btn hidden" id="deleteBtn" onclick="showDeleteConfirm()">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          删除
+        </button>
+        <div class="bread-edit-actions">
+          <button class="bread-edit-cancel-btn" onclick="closeModal()">取消</button>
+          <button class="bread-edit-save-btn" onclick="saveBread()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bread-delete-confirm-overlay hidden" id="deleteConfirmOverlay" onclick="if(event.target === this) hideDeleteConfirm()">
+    <div class="bread-delete-confirm-dialog" onclick="event.stopPropagation()">
+      <div class="bread-delete-confirm-title">确认删除</div>
+      <div class="bread-delete-confirm-message" id="deleteConfirmMessage">
+        确定要删除「经典法棍」吗？此操作不可恢复。
+      </div>
+      <div class="bread-delete-confirm-actions">
+        <button class="bread-delete-confirm-cancel" onclick="hideDeleteConfirm()">取消</button>
+        <button class="bread-delete-confirm-delete" onclick="deleteBread()">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const breadId = urlParams.get('id');
+    let imageData = '';
+
+    const mockBread = breadId ? {
+      id: breadId,
+      name: '经典法棍',
+      price: 18.00,
+      image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=400',
+      description: '传统法式工艺，72小时低温发酵，外脆内软',
+      dailyLimit: 20,
+    } : null;
+
+    if (mockBread) {
+      document.getElementById('modalTitle').textContent = '编辑面包';
+      document.getElementById('deleteBtn').classList.remove('hidden');
+      document.getElementById('breadName').value = mockBread.name;
+      document.getElementById('breadPrice').value = mockBread.price;
+      document.getElementById('dailyLimit').value = mockBread.dailyLimit;
+      document.getElementById('breadDescription').value = mockBread.description;
+      imageData = mockBread.image;
+      const preview = document.getElementById('imagePreview');
+      preview.src = mockBread.image;
+      preview.classList.remove('hidden');
+      document.getElementById('imagePlaceholder').classList.add('hidden');
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          imageData = reader.result;
+          const preview = document.getElementById('imagePreview');
+          preview.src = imageData;
+          preview.classList.remove('hidden');
+          document.getElementById('imagePlaceholder').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveBread() {
+      const name = document.getElementById('breadName').value.trim();
+      const price = document.getElementById('breadPrice').value;
+      const dailyLimit = document.getElementById('dailyLimit').value;
+      const description = document.getElementById('breadDescription').value.trim();
+
+      if (!name) {
+        alert('请输入面包名称');
+        return;
+      }
+      if (!price || parseFloat(price) <= 0) {
+        alert('请输入有效的价格');
+        return;
+      }
+      if (!dailyLimit || parseInt(dailyLimit) <= 0) {
+        alert('请输入有效的每日限量');
+        return;
+      }
+      if (!imageData) {
+        alert('请上传面包图片');
+        return;
+      }
+
+      alert(breadId ? '面包信息已更新' : '面包已添加');
+      closeModal();
+    }
+
+    function showDeleteConfirm() {
+      const name = document.getElementById('breadName').value.trim() || '这个面包';
+      document.getElementById('deleteConfirmMessage').textContent = `确定要删除「${name}」吗？此操作不可恢复。`;
+      document.getElementById('deleteConfirmOverlay').classList.remove('hidden');
+    }
+
+    function hideDeleteConfirm() {
+      document.getElementById('deleteConfirmOverlay').classList.add('hidden');
+    }
+
+    function deleteBread() {
+      alert('面包已删除');
+      hideDeleteConfirm();
+      closeModal();
+    }
+
+    function closeModal() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>

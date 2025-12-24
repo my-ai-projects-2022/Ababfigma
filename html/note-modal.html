@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>备注 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .note-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-out;
+      padding: 20px;
+    }
+
+    .note-modal-content {
+      background-color: white;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 16px;
+      position: relative;
+      animation: scaleIn 0.3s ease-out;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .note-modal-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--color-border);
+      position: relative;
+    }
+
+    .note-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      text-align: center;
+    }
+
+    .note-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .note-modal-body {
+      padding: 20px;
+    }
+
+    .note-baker-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 12px;
+    }
+
+    .note-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+
+    .note-textarea:focus {
+      border-color: var(--color-primary);
+    }
+
+    .note-char-count {
+      margin-top: 8px;
+      text-align: right;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .note-modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: 12px;
+    }
+
+    .note-cancel-btn,
+    .note-save-btn {
+      flex: 1;
+      height: 44px;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .note-cancel-btn {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+    }
+
+    .note-save-btn {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    }
+
+    .note-save-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="note-modal-overlay" onclick="if(event.target === this) window.history.back()">
+    <div class="note-modal-content">
+      <div class="note-modal-header">
+        <h2 class="note-modal-title">添加备注</h2>
+        <button class="note-modal-close" onclick="window.history.back()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="note-modal-body">
+        <div class="note-baker-name">麦田工坊</div>
+        <textarea
+          class="note-textarea"
+          id="noteTextarea"
+          placeholder="请输入备注信息..."
+          maxlength="200"
+        ></textarea>
+        <div class="note-char-count">
+          <span id="charCount">0</span>/200
+        </div>
+      </div>
+
+      <div class="note-modal-footer">
+        <button class="note-cancel-btn" onclick="window.history.back()">取消</button>
+        <button class="note-save-btn" onclick="saveNote()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateCharCount() {
+      const textarea = document.getElementById('noteTextarea');
+      const count = document.getElementById('charCount');
+      count.textContent = textarea.value.length;
+    }
+
+    function saveNote() {
+      const note = document.getElementById('noteTextarea').value.trim();
+      alert('备注已保存');
+      window.history.back();
+    }
+
+    document.getElementById('noteTextarea').addEventListener('input', updateCharCount);
+  </script>
+</body>
+</html>
+

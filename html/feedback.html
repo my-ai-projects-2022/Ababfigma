@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>问题反馈 - 面包工坊</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .feedback-page {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      z-index: 100;
+    }
+
+    .page-back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .page-header-spacer {
+      width: 40px;
+    }
+
+    .feedback-content {
+      padding: 16px;
+    }
+
+    .feedback-input-section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .feedback-textarea:focus {
+      border-color: var(--color-primary);
+    }
+
+    .feedback-textarea::placeholder {
+      color: var(--color-text-secondary);
+    }
+
+    .feedback-input-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+
+    .feedback-char-count {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .feedback-submit-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .feedback-submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .feedback-history-section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .feedback-history-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 16px;
+    }
+
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feedback-item {
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .feedback-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .feedback-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .feedback-item-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .feedback-item-time {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .feedback-item-content {
+      font-size: 14px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .feedback-reply {
+      padding: 12px;
+      background-color: var(--color-bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--color-primary);
+    }
+
+    .feedback-reply-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .feedback-reply-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .feedback-reply-time {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .feedback-reply-content {
+      font-size: 14px;
+      color: var(--color-text-primary);
+      line-height: 1.6;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .empty-icon {
+      color: var(--color-border);
+      margin-bottom: 16px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-hint {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="feedback-page">
+    <div class="page-header">
+      <button class="page-back-btn" onclick="window.history.back()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="page-title">问题反馈</h1>
+      <div class="page-header-spacer"></div>
+    </div>
+
+    <div class="feedback-content">
+      <div class="feedback-input-section">
+        <textarea
+          class="feedback-textarea"
+          id="feedbackText"
+          placeholder="请输入您的问题或建议..."
+          maxlength="500"
+          rows="6"
+        ></textarea>
+        <div class="feedback-input-footer">
+          <span class="feedback-char-count" id="charCount">0/500</span>
+          <button class="feedback-submit-btn" id="submitBtn" onclick="submitFeedback()">
+            <svg class="icon icon-sm" viewBox="0 0 24 24">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>提交反馈</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="feedback-history-section">
+        <h2 class="feedback-history-title">历史反馈</h2>
+        <div class="feedback-list" id="feedbackList">
+          <!-- 动态渲染 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const feedbacks = [
+      {
+        id: '1',
+        content: '希望能增加更多面包种类选择',
+        createdAt: '2024-01-15 10:30',
+        reply: '感谢您的建议，我们会持续丰富面包品类',
+        repliedAt: '2024-01-15 14:20',
+      },
+    ];
+
+    function renderFeedbacks() {
+      const container = document.getElementById('feedbackList');
+      if (feedbacks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg class="icon icon-xl empty-icon" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <p class="empty-text">暂无反馈记录</p>
+            <p class="empty-hint">您还没有提交过反馈</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = feedbacks.map(feedback => `
+        <div class="feedback-item">
+          <div class="feedback-item-header">
+            <span class="feedback-item-label">我的反馈</span>
+            <span class="feedback-item-time">${feedback.createdAt}</span>
+          </div>
+          <div class="feedback-item-content">${feedback.content}</div>
+          ${feedback.reply ? `
+            <div class="feedback-reply">
+              <div class="feedback-reply-header">
+                <span class="feedback-reply-label">官方回复</span>
+                <span class="feedback-reply-time">${feedback.repliedAt}</span>
+              </div>
+              <div class="feedback-reply-content">${feedback.reply}</div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function updateCharCount() {
+      const textarea = document.getElementById('feedbackText');
+      const charCount = document.getElementById('charCount');
+      charCount.textContent = `${textarea.value.length}/500`;
+    }
+
+    function submitFeedback() {
+      const textarea = document.getElementById('feedbackText');
+      const content = textarea.value.trim();
+
+      if (!content) {
+        alert('请输入反馈内容');
+        return;
+      }
+
+      if (content.length < 10) {
+        alert('反馈内容至少需要10个字');
+        return;
+      }
+
+      const newFeedback = {
+        id: Date.now().toString(),
+        content,
+        createdAt: new Date().toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      };
+
+      feedbacks.unshift(newFeedback);
+      textarea.value = '';
+      updateCharCount();
+      renderFeedbacks();
+      alert('反馈已提交');
+    }
+
+    document.getElementById('feedbackText').addEventListener('input', updateCharCount);
+    renderFeedbacks();
+  </script>
+</body>
+</html>
+
