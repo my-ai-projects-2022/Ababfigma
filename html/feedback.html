@@ -134,13 +134,9 @@
     }
 
     .feedback-item {
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .feedback-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 12px;
     }
 
     .feedback-item-header {
@@ -151,9 +147,9 @@
     }
 
     .feedback-item-label {
-      font-size: 13px;
+      color: var(--color-primary);
+      font-size: 12px;
       font-weight: 600;
-      color: var(--color-text-primary);
     }
 
     .feedback-item-time {
@@ -185,7 +181,7 @@
     .feedback-reply-label {
       font-size: 13px;
       font-weight: 600;
-      color: var(--color-primary);
+      color: var(--color-success);
     }
 
     .feedback-reply-time {
@@ -194,8 +190,8 @@
     }
 
     .feedback-reply-content {
+      color: var(--color-text-secondary);
       font-size: 14px;
-      color: var(--color-text-primary);
       line-height: 1.6;
     }
 
@@ -230,7 +226,7 @@
   <div class="feedback-page">
     <div class="page-header">
       <button class="page-back-btn" onclick="window.history.back()">
-        <svg class="icon icon-lg" viewBox="0 0 24 24">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       </button>
@@ -250,9 +246,9 @@
         <div class="feedback-input-footer">
           <span class="feedback-char-count" id="charCount">0/500</span>
           <button class="feedback-submit-btn" id="submitBtn" onclick="submitFeedback()">
-            <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
               <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              <path d="M22 2l-7 20-4-9-9-4z"></path>
             </svg>
             <span>提交反馈</span>
           </button>
@@ -284,7 +280,7 @@
       if (feedbacks.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <svg class="icon icon-xl empty-icon" viewBox="0 0 24 24">
+            <svg class="icon empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 64px; height: 64px;">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <p class="empty-text">暂无反馈记录</p>

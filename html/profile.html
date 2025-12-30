@@ -79,18 +79,31 @@
     }
 
     .profile-settings-btn {
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
       width: 44px;
       height: 44px;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
       transition: all 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      border: none;
+    }
+
+    .profile-settings-btn:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg) scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-settings-btn:active {
+      transform: rotate(90deg) scale(0.95);
     }
 
     .profile-login-btn {
@@ -348,9 +361,9 @@
           <!-- 动态渲染 -->
         </div>
         <button class="profile-settings-btn" id="settingsBtn" onclick="toggleSettings()">
-          <svg class="icon icon-lg" viewBox="0 0 24 24">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: white;">
             <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364L16.95 16.95m-9.9-9.9L7.05 7.05M21.364 4.636l-2.121 2.121m-12.728 0L4.636 4.636"></path>
+            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 18.364m12.728 0l-4.243-4.243m-4.242 0L5.636 5.636"></path>
           </svg>
         </button>
       </div>
@@ -511,8 +524,8 @@
         if (!isBaker) {
           container.innerHTML = `
             <button class="profile-become-baker-btn-small" onclick="window.location.href='become-baker-modal.html'">
-              <span>成为主理人</span>
-              <svg class="icon icon-sm" viewBox="0 0 24 24">
+              <span class="baker-btn-text">成为主理人</span>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </button>
@@ -520,9 +533,12 @@
         }
         container.innerHTML += `
           <button class="profile-switch-baker-btn-small" onclick="window.location.href='baker-profile.html'">
-            <span>主理人</span>
-            <svg class="icon icon-sm" viewBox="0 0 24 24">
-              <polyline points="9 18 15 12 9 6"></polyline>
+            <span class="baker-btn-text">主理人</span>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+              <polyline points="17 11 21 7 17 3"></polyline>
+              <path d="M21 7H7"></path>
+              <polyline points="7 13 3 17 7 21"></polyline>
+              <path d="M3 17h14"></path>
             </svg>
           </button>
         `;
