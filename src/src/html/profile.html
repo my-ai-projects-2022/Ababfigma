@@ -25,7 +25,7 @@
     .profile-header {
       background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
       border-radius: 0 0 24px 24px;
-      padding: 44px 16px 16px;
+      padding: 44px 16px 24px;
       color: white;
     }
 
@@ -33,7 +33,6 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
     }
 
     .user-main {
@@ -84,27 +83,82 @@
       cursor: pointer;
     }
 
-    .quick-actions {
-      display: flex;
-      gap: 8px;
+    /* 主理人入口区域 */
+    .baker-entrance-section {
+      padding: 16px;
+      margin-top: -20px;
     }
 
-    .quick-btn {
-      flex: 1;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
+    .baker-entrance-card {
+      background: linear-gradient(135deg, rgba(230, 126, 34, 0.05) 0%, rgba(243, 156, 18, 0.05) 100%);
+      border: 2px solid #E67E22;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.1);
+    }
+
+    .baker-entrance-card:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 6px rgba(230, 126, 34, 0.15);
+    }
+
+    .baker-entrance-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .baker-entrance-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+    }
+
+    .baker-entrance-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #E67E22;
+    }
+
+    .baker-entrance-desc {
+      font-size: 13px;
+      color: #7F8C8D;
+      line-height: 1.5;
+    }
+
+    /* 成为主理人卡片 - 渐变背景样式 */
+    .become-baker-card {
+      background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
+      border: none;
+      color: white;
+    }
+
+    .become-baker-card .baker-entrance-icon {
+      background: rgba(255, 255, 255, 0.3);
       backdrop-filter: blur(10px);
+    }
+
+    .become-baker-card .baker-entrance-title {
+      color: white;
+    }
+
+    .become-baker-card .baker-entrance-desc {
+      color: rgba(255, 255, 255, 0.9);
     }
 
     /* 功能菜单 */
     .menu-section {
-      padding: 16px;
+      padding: 0 16px 16px;
     }
 
     .menu-card {
@@ -252,10 +306,6 @@
       </div>
       <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
     </div>
-    <div class="quick-actions">
-      <button class="quick-btn">成为主理人</button>
-      <button class="quick-btn">主理人</button>
-    </div>
   </div>
 
   <!-- 设置下拉菜单 -->
@@ -265,6 +315,27 @@
     </div>
     <div class="settings-item">
       🚪 退出登录
+    </div>
+  </div>
+
+  <!-- 主理人入口区域 -->
+  <div class="baker-entrance-section">
+    <!-- 成为主理人卡片 - 橙色渐变背景 -->
+    <div class="baker-entrance-card become-baker-card">
+      <div class="baker-entrance-header">
+        <div class="baker-entrance-icon">✨</div>
+        <div class="baker-entrance-title">成为主理人</div>
+      </div>
+      <div class="baker-entrance-desc">开启你的面包工坊之旅，分享你的烘焙故事，与面包爱好者们一起成长。</div>
+    </div>
+
+    <!-- 主理人入口卡片 - 边框样式 -->
+    <div class="baker-entrance-card">
+      <div class="baker-entrance-header">
+        <div class="baker-entrance-icon">🏪</div>
+        <div class="baker-entrance-title">主理人中心</div>
+      </div>
+      <div class="baker-entrance-desc">管理你的面包工坊，查看订单数据，与顾客互动，提升经营效率。</div>
     </div>
   </div>
 
